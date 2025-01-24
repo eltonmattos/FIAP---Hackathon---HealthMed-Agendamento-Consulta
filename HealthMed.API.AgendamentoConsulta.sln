@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthMed.API.AgendamentoConsulta", "HealthMed.API.AgendamentoConsulta\HealthMed.API.AgendamentoConsulta.csproj", "{5A777BAA-B94F-4E0D-897C-11C7C22B5FF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthMed.API.AgendamentoConsulta.UnitTests", "HealthMed.API.AgendamentoConsulta.UnitTests\HealthMed.API.AgendamentoConsulta.UnitTests.csproj", "{57F0AEE4-D2E6-47A4-8714-7E11648EC644}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A777BAA-B94F-4E0D-897C-11C7C22B5FF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A777BAA-B94F-4E0D-897C-11C7C22B5FF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A777BAA-B94F-4E0D-897C-11C7C22B5FF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A777BAA-B94F-4E0D-897C-11C7C22B5FF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F0AEE4-D2E6-47A4-8714-7E11648EC644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F0AEE4-D2E6-47A4-8714-7E11648EC644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F0AEE4-D2E6-47A4-8714-7E11648EC644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F0AEE4-D2E6-47A4-8714-7E11648EC644}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
