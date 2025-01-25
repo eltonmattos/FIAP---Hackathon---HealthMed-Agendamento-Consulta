@@ -12,12 +12,9 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         {
             SetId(Guid.NewGuid());
             this.Nome = nome;
-            this.Funcao = Funcao.Paciente;
             this.Email = email;
             this.Senha = senha;
             this.CPF = CPF;
-
-            PacienteRepository.Validate(this);
         }
     }
 }

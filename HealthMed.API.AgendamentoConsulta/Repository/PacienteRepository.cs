@@ -1,4 +1,5 @@
-﻿using HealthMed.API.AgendamentoConsulta.Database;
+﻿using Dapper;
+using HealthMed.API.AgendamentoConsulta.Database;
 using HealthMed.API.AgendamentoConsulta.Models;
 using Microsoft.Data.SqlClient;
 using System.Net.Mail;
@@ -20,8 +21,9 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid Post(Paciente paciente)
         {
-            //UsuarioRepository.Validate(paciente);
-            //PacienteRepository.ValidateCPF(paciente.CPF);
+            UsuarioRepository.ValidateEmail(paciente.Email);
+            UsuarioRepository.ValidateCPF(paciente.CPF);
+            UsuarioRepository.ValidatePassword(paciente.Senha);
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -51,20 +53,32 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-
-        public static void Validate(Paciente paciente)
+        public String GetToken(String email, String senha)
         {
-            if (!String.IsNullOrEmpty(paciente.CPF))
+            UsuarioRepository.ValidateEmail(email);
+
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+
+            if (sqldb == null || sqldb.connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.connection)
             {
-                try
-                {
-                    ValidateCPF(paciente.CPF);
-                }
-                catch (FormatException)
-                {
-                    throw new FormatException("CPF inválido");
-                }
+                Guid idPaciente = Guid.NewGuid();
+                var query = new StringBuilder();
+                dbname = this._config.GetValue<string>("DatabaseName");
+                query.Append($"SELECT [Id] FROM {dbname}.dbo.Paciente ");
+                query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
+
+                String? result = sqldb.connection?.QueryFirstOrDefault<String>(query.ToString());
+
+                if (result == null)
+                    throw new Exception("Usuário não encontrado");
+
+                return result.ToString();
             }
         }
+
+        //TODO: Validar se usuario já existe (Email + CPF)
     }
 }

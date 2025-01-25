@@ -1,20 +1,40 @@
 ﻿using System.Net.Mail;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Azure.Identity;
+using HealthMed.API.AgendamentoConsulta.Database;
 using HealthMed.API.AgendamentoConsulta.Models;
+using Microsoft.Data.SqlClient;
 
 
 namespace HealthMed.API.AgendamentoConsulta.Repository
 {
-    public class UsuarioRepository
+    public abstract class UsuarioRepository
     {
-        public static void Validate(Usuario usuario)
+        public static void ValidatePassword(String password)
         {
-            if (!String.IsNullOrEmpty(usuario.Email))
+            if (string.IsNullOrWhiteSpace(password) ||
+            password.Length < 6 ||
+            !password.Any(char.IsUpper) ||
+            !password.Any(char.IsLower) ||
+            !password.Any(char.IsDigit))
+            {
+                throw new FormatException(@"Comprimento mínimo: A senha deve ser composta de:
+                                            - Pelo menos 8 caracteres.
+                                            - Pelo menos uma letra maiúscula.
+                                            - Pelo menos uma letra minúscula.
+                                            - Pelo menos um número.");
+            }
+        }
+
+        public static void ValidateEmail(String email)
+        {
+            if (!String.IsNullOrEmpty(email))
             {
                 try
                 {
-                    MailAddress m = new MailAddress(usuario.Email);
+                    MailAddress m = new MailAddress(email);
                 }
                 catch (FormatException)
                 {
@@ -23,13 +43,13 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public static bool ValidateCPF(string cpf)
+        public static void ValidateCPF(String cpf)
         {
             // Remove caracteres não numéricos
             cpf = cpf.Replace(".", "").Replace("-", "");
 
             if (cpf.Length != 11 || !long.TryParse(cpf, out _))
-                return false;
+                throw new FormatException("CPF inválido");
 
             // Verifica se todos os dígitos são iguais
             bool allSameDigits = true;
@@ -40,7 +60,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
 
             if (allSameDigits)
-                return false;
+                throw new FormatException("CPF inválido");
 
             // Calcula o primeiro dígito verificador
             int sum = 0;
@@ -53,7 +73,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             int firstVerifierDigit = (remainder < 2) ? 0 : 11 - remainder;
 
             if (cpf[9] - '0' != firstVerifierDigit)
-                return false;
+                throw new FormatException("CPF inválido");
 
             // Calcula o segundo dígito verificador
             sum = 0;
@@ -65,7 +85,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             remainder = sum % 11;
             int secondVerifierDigit = (remainder < 2) ? 0 : 11 - remainder;
 
-            return cpf[10] - '0' == secondVerifierDigit;
+            if (cpf[10] - '0' != secondVerifierDigit)
+                throw new FormatException("CPF inválido");
         }
     }
 }

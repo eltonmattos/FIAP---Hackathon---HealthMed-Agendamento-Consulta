@@ -1,16 +1,8 @@
-﻿using System.Net.Mail;
-
-namespace HealthMed.API.AgendamentoConsulta.Models
+﻿namespace HealthMed.API.AgendamentoConsulta.Models
 {
-    public enum Funcao
-    {
-        Administrador,
-        Medico,
-        Paciente
-    }
     public class Usuario
     {
-        public Guid Id { get; set; }
+        protected Guid Id { get; set; }
         public Guid GetId()
         {
             return Id;
@@ -23,7 +15,6 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public required string Nome { get; set; }
         public required string Email { get; set; }
         public required string Senha { get; set; }
-        public required Funcao Funcao { get; set; }
 
         public Usuario()
         {
