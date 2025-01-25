@@ -1,8 +1,14 @@
+using HealthMed.API.AgendamentoConsulta.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<MedicoRepository>();
+builder.Services.AddScoped<PacienteRepository>();
+builder.Services.AddScoped<AgendamentoRepository>();   
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,83 +1,114 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HealthMed.API.AgendamentoConsulta.Models;
+using HealthMed.API.AgendamentoConsulta.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
-    public class PacienteController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PacienteController : ControllerBase
     {
-        // GET: PacienteController
-        public ActionResult Index()
+        private readonly ILogger<PacienteController> _logger;
+        private readonly PacienteRepository _pacienteRepository;
+
+        public PacienteController(ILogger<PacienteController> logger, PacienteRepository pacienteRepository)
         {
-            return View();
+            _logger = logger;
+            _pacienteRepository = pacienteRepository;
         }
 
-        // GET: PacienteController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        //// GET: PacienteController
+        //public ActionResult Index()
+        //{
+        //    return View();
+        //}
 
-        // GET: PacienteController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+        //// GET: PacienteController/Details/5
+        //public ActionResult Details(int id)
+        //{
+        //    return View();
+        //}
 
-        // POST: PacienteController/Create
+        //// GET: PacienteController/Create
+        //public ActionResult Create()
+        //{
+        //    return View();
+        //}
+
+        // POST: api/<PacienteController>
+        /// <summary>
+        /// Cadastro de Paciente
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Post([FromBody] Paciente value)
         {
-            try
+            Guid idPaciente = _pacienteRepository.Post(value);
+            return Ok(new
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                Message = "Paciente cadastrado com sucesso.",
+                Id = idPaciente
+            });
         }
 
-        // GET: PacienteController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+        //// POST: PacienteController/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Create(IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
-        // POST: PacienteController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// GET: PacienteController/Edit/5
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
 
-        // GET: PacienteController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        //// POST: PacienteController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
-        // POST: PacienteController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        //// GET: PacienteController/Delete/5
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
+
+        //// POST: PacienteController/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
     }
 }
