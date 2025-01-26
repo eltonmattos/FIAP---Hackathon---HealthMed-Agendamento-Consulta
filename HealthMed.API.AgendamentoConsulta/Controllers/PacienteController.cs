@@ -8,16 +8,10 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PacienteController : ControllerBase
+    public class PacienteController(ILogger<PacienteController> logger, PacienteRepository pacienteRepository) : ControllerBase
     {
-        private readonly ILogger<PacienteController> _logger;
-        private readonly PacienteRepository _pacienteRepository;
-
-        public PacienteController(ILogger<PacienteController> logger, PacienteRepository pacienteRepository)
-        {
-            _logger = logger;
-            _pacienteRepository = pacienteRepository;
-        }
+        private readonly ILogger<PacienteController> _logger = logger;
+        private readonly PacienteRepository _pacienteRepository = pacienteRepository;
 
         //// GET: PacienteController
         //public ActionResult Index()
@@ -47,6 +41,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         public IActionResult Post([FromBody] Paciente value)
         {
             Guid idPaciente = _pacienteRepository.Post(value);
+            _logger.LogInformation("Paciente cadastrado com sucesso.");
             return Ok(new
             {
                 Message = "Paciente cadastrado com sucesso.",

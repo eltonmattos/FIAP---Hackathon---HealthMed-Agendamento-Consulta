@@ -13,21 +13,14 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(ILogger<PacienteController> logger,
+        PacienteRepository pacienteRepository,
+        MedicoRepository medicoRepository) : ControllerBase
     {
 
-        private readonly ILogger<PacienteController> _logger;
-        private readonly PacienteRepository _pacienteRepository;
-        private readonly MedicoRepository _medicoRepository;
-
-        public AuthController(ILogger<PacienteController> logger, 
-            PacienteRepository pacienteRepository,
-            MedicoRepository medicoRepository)
-        {
-            _logger = logger;
-            _pacienteRepository = pacienteRepository;
-            _medicoRepository = medicoRepository;
-        }
+        private readonly ILogger<PacienteController> _logger = logger;
+        private readonly PacienteRepository _pacienteRepository = pacienteRepository;
+        private readonly MedicoRepository _medicoRepository = medicoRepository;
 
         [HttpGet]
         [Authorize]
@@ -57,29 +50,36 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         [HttpPost("LoginMedico")]
         public IActionResult LoginMedico(String email, String password)
         {
-            String token = _medicoRepository.GetToken(email, password);
+            String? token = _medicoRepository.GetToken(email, password);
 
             if (!String.IsNullOrEmpty(token))
             {
-                return Ok(token);
-                //var token = generatejwttoken(user.username);
-                //return ok(new { token });
+                if (Guid.Parse(token) != Guid.Empty)
+                {
+                    _logger.LogInformation("Médico logado com sucesso.");
+                    return Ok(token);
+                }
+
+                    //var token = generatejwttoken(user.username);
+                    //return ok(new { token });
             }
-            return Unauthorized();
+            _logger.LogError("Usuário ou senha inválida.");
+            return Unauthorized("Usuário ou senha inválida.");
         }
 
         [HttpPost("LoginPaciente")]
         public IActionResult LoginPaciente(String email, String password)
         {
-            String token = _pacienteRepository.GetToken(email, password);
+            String? token = _pacienteRepository.GetToken(email, password);
             
             if (!String.IsNullOrEmpty(token))
-            { 
-                return Ok(token);
-                //var token = generatejwttoken(user.username);
-                //return ok(new { token });
+            {
+                if (Guid.Parse(token) != Guid.Empty)
+                    return Ok(token);
+                    //var token = generatejwttoken(user.username);
+                    //return ok(new { token });
             }
-            return Unauthorized();
+            return Unauthorized("Usuário ou senha inválida.");
         }
     }
 }
