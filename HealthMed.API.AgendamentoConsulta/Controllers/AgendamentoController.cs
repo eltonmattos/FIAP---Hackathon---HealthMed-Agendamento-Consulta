@@ -39,20 +39,19 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         //[Authorize]
-        [HttpGet]
-        public IActionResult Get([FromBody] DateTime value)
-        {
-            List<Agendamento> agendamentos = _agendamentoRepository.Get(value);
-            return Ok(agendamentos);
-        }
+        //[HttpGet]
+        //public IActionResult Get([FromBody] DateTime value)
+        //{
+        //    IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get(value);
+        //    return Ok(agendamentos);
+        //}
 
-        public IActionResult Get()
-        {
-            List<Agendamento> agendamentos = _agendamentoRepository.Get();
-            return Ok(agendamentos);
-        }
-
-
+        //[HttpGet]
+        //public IActionResult Get()
+        //{
+        //    IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get();
+        //    return Ok(agendamentos);
+        //}
 
         //    // GET: AgendamentoController/Details/5
         //    public ActionResult Details(int id)

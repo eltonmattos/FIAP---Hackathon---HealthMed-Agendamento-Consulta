@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System;
 using System.Text;
 using System.Xml.Linq;
+using Dapper;
 
 namespace HealthMed.API.AgendamentoConsulta.Repository
 {
@@ -17,6 +18,9 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid Post(Agendamento agendamento)
         {
+            if (DateTime.Compare(agendamento.dataInicio, agendamento.dataFim) >= 0)
+                throw new Exception("Data de início não pode ser menor ou igual à data fim");
+
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
             if (sqldb == null || sqldb.connection == null)
@@ -35,12 +39,11 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     [IdPaciente]
                 ) VALUES (
                     '{idAgendamento}',
-                    '{agendamento.dataInicio}',
-                    `{agendamento.dataFim}',
+                    '{agendamento.dataInicio.ToString("s")}',
+                    '{agendamento.dataFim.ToString("s")}',
                     '{agendamento.medico}',
-                    '{agendamento.paciente}' 
-                );
-                ");
+                    '{agendamento.paciente}'
+                )");
 
                 sqldb.connection.Open();
                 SqlCommand command = new(query.ToString(), sqldb.connection);
@@ -50,81 +53,54 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public List<Agendamento> Get(DateTime data)
+        public IEnumerable<Agendamento> Get()
         {
-            List<Agendamento> agendamentos = [];
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.connection == null)
+                throw new Exception("SQL ERROR");
 
-            //sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            using (sqldb.connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"SELECT TOP (1000) [Id]
+                                    ,[DataInicio]
+                                    ,[DataFim]
+                                    ,[IdMedico]
+                                    ,[IdPaciente]
+                                FROM [HealthMedAgendamento].[dbo].[Agendamento] ");
 
-            //if (sqldb == null || sqldb.connection == null)
-            //    throw new Exception("SQL ERROR");
+                IEnumerable<Agendamento> result = sqldb.connection.Query<Agendamento>(
+                    query.ToString(), param: null);
 
-            //using (sqldb.connection)
-            //{
-            //    Guid idAgendamento = Guid.NewGuid();
-            //    var query = new StringBuilder();
-            //    dbname = this._config.GetValue<string>("DatabaseName");
-            //    query.Append($@"INSERT INTO [dbo].[Agendamento] (
-            //        [Id], 
-            //        [DataInicio], 
-            //        [DataFim], 
-            //        [IdMedico], 
-            //        [IdPaciente]
-            //    ) VALUES (
-            //        '{idAgendamento}',
-            //        '{agendamento.dataInicio}',
-            //        `{agendamento.dataFim}',
-            //        '{agendamento.medico}',
-            //        '{agendamento.paciente}' 
-            //    );
-            //    ");
-
-            //    sqldb.connection.Open();
-            //    SqlCommand command = new SqlCommand(query.ToString(), sqldb.connection);
-            //    command.ExecuteNonQuery();
-            //    sqldb.connection.Close();
-            //    return idAgendamento;
-            //}
-            return agendamentos;
-        }
-        public List<Agendamento> Get()
-        {
-            List<Agendamento> agendamentos = [];
-            //sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
-
-            //if (sqldb == null || sqldb.connection == null)
-            //    throw new Exception("SQL ERROR");
-
-            //using (sqldb.connection)
-            //{
-            //    Guid idAgendamento = Guid.NewGuid();
-            //    var query = new StringBuilder();
-            //    dbname = this._config.GetValue<string>("DatabaseName");
-            //    query.Append($@"INSERT INTO [dbo].[Agendamento] (
-            //        [Id], 
-            //        [DataInicio], 
-            //        [DataFim], 
-            //        [IdMedico], 
-            //        [IdPaciente]
-            //    ) VALUES (
-            //        '{idAgendamento}',
-            //        '{agendamento.dataInicio}',
-            //        `{agendamento.dataFim}',
-            //        '{agendamento.medico}',
-            //        '{agendamento.paciente}' 
-            //    );
-            //    ");
-
-            //    sqldb.connection.Open();
-            //    SqlCommand command = new SqlCommand(query.ToString(), sqldb.connection);
-            //    command.ExecuteNonQuery();
-            //    sqldb.connection.Close();
-            //    return idAgendamento;
-            //}
-
-            return agendamentos;
+                sqldb.connection.Close();
+                return result;
+            }
         }
 
+        public IEnumerable<Agendamento> Get(DateTime data)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.connection == null)
+                throw new Exception("SQL ERROR");
 
+            using (sqldb.connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"SELECT [Id]
+                                    ,[DataInicio]
+                                    ,[DataFim]
+                                    ,[IdMedico]
+                                    ,[IdPaciente]
+                                FROM [HealthMedAgendamento].[dbo].[Agendamento] ");
+
+                query.Append($"WHERE DataInicio.Date = '{data.ToString("yyyy-MM-dd")}'");
+
+                IEnumerable<Agendamento> result = sqldb.connection.Query<Agendamento>(
+                    query.ToString(), param: null);
+
+                sqldb.connection.Close();
+                return result;
+            }
+        }
     }
 }
