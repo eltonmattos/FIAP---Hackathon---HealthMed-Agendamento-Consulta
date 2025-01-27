@@ -1,5 +1,6 @@
 ﻿using HealthMed.API.AgendamentoConsulta.Models;
 using HealthMed.API.AgendamentoConsulta.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         //[Authorize]
-        [HttpPost]
+        [HttpPost("/api/Agendamento/")]
         public IActionResult Post([FromBody] Agendamento value)
         {
             Guid idAgendamento = _agendamentoRepository.Post(value);
@@ -36,90 +37,27 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <summary>
         /// Obter Agendamentos
         /// </summary>
-        /// <param name="value"></param>
         /// <returns></returns>
         //[Authorize]
-        //[HttpGet]
-        //public IActionResult Get([FromBody] DateTime value)
-        //{
-        //    IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get(value);
-        //    return Ok(agendamentos);
-        //}
+        [HttpGet("/api/Agendamento/")]
+        public IActionResult Get()
+        {
+            IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get();
+            return Ok(agendamentos);
+        }
 
-        //[HttpGet]
-        //public IActionResult Get()
-        //{
-        //    IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get();
-        //    return Ok(agendamentos);
-        //}
-
-        //    // GET: AgendamentoController/Details/5
-        //    public ActionResult Details(int id)
-        //    {
-        //        return View();
-        //    }
-
-        //    // GET: AgendamentoController/Create
-        //    public ActionResult Create()
-        //    {
-        //        return View();
-        //    }
-
-        //    // POST: AgendamentoController/Create
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public ActionResult Create(IFormCollection collection)
-        //    {
-        //        try
-        //        {
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }
-
-        //    // GET: AgendamentoController/Edit/5
-        //    public ActionResult Edit(int id)
-        //    {
-        //        return View();
-        //    }
-
-        //    // POST: AgendamentoController/Edit/5
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public ActionResult Edit(int id, IFormCollection collection)
-        //    {
-        //        try
-        //        {
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }
-
-        //    // GET: AgendamentoController/Delete/5
-        //    public ActionResult Delete(int id)
-        //    {
-        //        return View();
-        //    }
-
-        //    // POST: AgendamentoController/Delete/5
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public ActionResult Delete(int id, IFormCollection collection)
-        //    {
-        //        try
-        //        {
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }
+        // GET: AgendamentoController
+        /// <summary>
+        /// Obter Agendamentos por Data
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <returns></returns>
+        [HttpGet("/api/Agendamento/{Data}")]
+        public IActionResult Get(String Data)
+        {
+            DateTime dateFormat = DateTime.Parse(Data);
+            IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get(dateFormat);
+            return Ok(agendamentos);
+        }
     }
 }

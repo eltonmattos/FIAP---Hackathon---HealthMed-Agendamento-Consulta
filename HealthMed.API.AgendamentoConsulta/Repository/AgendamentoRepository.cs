@@ -18,7 +18,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid Post(Agendamento agendamento)
         {
-            if (DateTime.Compare(agendamento.dataInicio, agendamento.dataFim) >= 0)
+            if (DateTime.Compare(agendamento.DataInicio, agendamento.DataFim) >= 0)
                 throw new Exception("Data de início não pode ser menor ou igual à data fim");
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
@@ -39,10 +39,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     [IdPaciente]
                 ) VALUES (
                     '{idAgendamento}',
-                    '{agendamento.dataInicio.ToString("s")}',
-                    '{agendamento.dataFim.ToString("s")}',
-                    '{agendamento.medico}',
-                    '{agendamento.paciente}'
+                    '{agendamento.DataInicio.ToString("s")}',
+                    '{agendamento.DataFim.ToString("s")}',
+                    '{agendamento.Medico}',
+                    '{agendamento.Paciente}'
                 )");
 
                 sqldb.connection.Open();
@@ -50,30 +50,6 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                  command.ExecuteNonQuery();
                 sqldb.connection.Close();
                 return idAgendamento;
-            }
-        }
-
-        public IEnumerable<Agendamento> Get()
-        {
-            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
-            if (sqldb == null || sqldb.connection == null)
-                throw new Exception("SQL ERROR");
-
-            using (sqldb.connection)
-            {
-                var query = new StringBuilder();
-                query.Append(@$"SELECT TOP (1000) [Id]
-                                    ,[DataInicio]
-                                    ,[DataFim]
-                                    ,[IdMedico]
-                                    ,[IdPaciente]
-                                FROM [HealthMedAgendamento].[dbo].[Agendamento] ");
-
-                IEnumerable<Agendamento> result = sqldb.connection.Query<Agendamento>(
-                    query.ToString(), param: null);
-
-                sqldb.connection.Close();
-                return result;
             }
         }
 
@@ -93,7 +69,31 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                                     ,[IdPaciente]
                                 FROM [HealthMedAgendamento].[dbo].[Agendamento] ");
 
-                query.Append($"WHERE DataInicio.Date = '{data.ToString("yyyy-MM-dd")}'");
+                query.Append($"WHERE CAST(DataInicio AS DATE) = '{data.ToString("yyyy-MM-dd")}'");
+
+                IEnumerable<Agendamento> result = sqldb.connection.Query<Agendamento>(
+                    query.ToString(), param: null);
+
+                sqldb.connection.Close();
+                return result;
+            }
+        }
+
+        public IEnumerable<Agendamento> Get()
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"SELECT [Id]
+                                    ,[DataInicio]
+                                    ,[DataFim]
+                                    ,[IdMedico]
+                                    ,[IdPaciente]
+                                FROM [HealthMedAgendamento].[dbo].[Agendamento] ");
 
                 IEnumerable<Agendamento> result = sqldb.connection.Query<Agendamento>(
                     query.ToString(), param: null);

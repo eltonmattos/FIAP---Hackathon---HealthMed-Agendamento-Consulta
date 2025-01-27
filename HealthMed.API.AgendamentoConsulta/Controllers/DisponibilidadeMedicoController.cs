@@ -13,17 +13,51 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         private readonly ILogger<DisponibilidadeMedicoController> _logger = logger;
         private readonly DisponibilidadeMedicoRepository _disponibilidadeMedicoRepository = disponibilidadeMedicoRepository;
 
-        // POST: api/<MedicoController>
+        // GET: DisponibilidadeMedicoController
         /// <summary>
-        /// Cadastro de Médico
+        /// Obter Horários de Disponibilidade do Médico
+        /// </summary>
+        /// <param name="idMedico"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("/api/DisponibilidadeMedico/{idMedico}")]
+        public IActionResult Get(String idMedico)
+        {
+            IEnumerable<DisponibilidadeMedico> agendamentos = _disponibilidadeMedicoRepository.Get(idMedico);
+            return Ok(agendamentos);
+        }
+
+        // POST: DisponibilidadeMedicoController
+        /// <summary>
+        /// Cadastrar Horários de Disponibilidade do Médico
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         //[Authorize]
-        [HttpPost]
+        [HttpPost("/api/DisponibilidadeMedico/")]
         public IActionResult Post([FromBody] DisponibilidadeMedico value)
         {
             Guid idDisponibilidadeMedico = _disponibilidadeMedicoRepository.Post(value);
+            _logger.LogInformation("Período de Disponibilidade cadastrado com sucesso.");
+            return Ok(new
+            {
+                Message = "Período de Disponibilidade cadastrado com sucesso.",
+                Id = idDisponibilidadeMedico
+            });
+        }
+
+        // PUT: DisponibilidadeMedicoController
+        /// <summary>
+        /// Cadastrar Horários de Disponibilidade do Médico
+        /// </summary>
+        /// <param name="idMedico"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpPut("/api/DisponibilidadeMedico/{idMedico}")]
+        public IActionResult Put(String idMedico, [FromBody] DisponibilidadeMedico value)
+        {
+            Guid idDisponibilidadeMedico = _disponibilidadeMedicoRepository.Put(idMedico, value);
             _logger.LogInformation("Período de Disponibilidade cadastrado com sucesso.");
             return Ok(new
             {

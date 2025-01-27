@@ -20,14 +20,24 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public required TimeSpan FimPeriodo { get; set; }
         public required DateTime Validade { get; set; }
 
-        public DisponibilidadeMedico(Guid medico, int diaSemana, TimeSpan inicioPeriodo, TimeSpan fimPeriodo, DateTime validade)
+        public DisponibilidadeMedico(String Id, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade, String IdMedico)
+        {
+            this.Id = Guid.Parse(Id);
+            this.Medico = Guid.Parse(IdMedico);
+            this.DiaSemana = DiaSemana;
+            this.InicioPeriodo = InicioPeriodo;
+            this.FimPeriodo = FimPeriodo;
+            this.Validade = Validade;
+        }
+
+        public DisponibilidadeMedico(Guid idMedico, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
             SetId(Guid.NewGuid());
-            this.Medico = medico;
-            this.DiaSemana = diaSemana;
-            this.InicioPeriodo = fimPeriodo;
-            this.FimPeriodo = fimPeriodo;
-            this.Validade = validade;
+            this.Medico = idMedico;
+            this.DiaSemana = DiaSemana;
+            this.InicioPeriodo = InicioPeriodo;
+            this.FimPeriodo = FimPeriodo;
+            this.Validade = Validade;
         }
     }
 }

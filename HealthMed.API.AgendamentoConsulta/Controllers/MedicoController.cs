@@ -13,10 +13,18 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         private readonly MedicoRepository _medicoRepository = medicoRepository;
 
         //// GET: MedicoController
-        //public ActionResult Index()
-        //{
-        //    //return View();
-        //}
+        /// <summary>
+        /// Obter Medicos
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("/api/Medico/")]
+        public IActionResult Get()
+        {
+            IEnumerable<object> medicos = _medicoRepository.Get();
+            return Ok(medicos);
+        }
 
         //// GET: MedicoController/Details/5
         //public ActionResult Details(int id)
@@ -36,7 +44,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("/api/Medico/")]
         public IActionResult Post([FromBody] Medico value)
         {
             Guid idMedico = _medicoRepository.Post(value);

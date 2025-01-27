@@ -53,6 +53,38 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
+        public IEnumerable<object> Get()
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"SELECT [Id] ,[Nome] FROM [HealthMedAgendamento].[dbo].[Medico] ");
+
+                IEnumerable<Medico> result = sqldb.connection.Query<Medico>(
+                    query.ToString(), param: null);
+
+                sqldb.connection.Close();
+
+                List<object> getMedicos = [];
+
+                foreach (var medico in result)
+                {
+                    object getMedico = new
+                    {
+                        Id = medico.GetId(),
+                        medico.Nome
+                    };
+                    getMedicos.Add(getMedico);
+                }
+
+                return getMedicos.AsEnumerable();
+            }
+        }
+
         public Guid HorarioDisponivel(Medico medico)
         {
             UsuarioRepository.ValidateEmail(medico.Email);

@@ -12,18 +12,26 @@
         {
             Id = value;
         }
-        public required Guid paciente { get; set; }
-        public required Guid medico { get; set; }
-        public required DateTime dataInicio { get; set; }
-        public required DateTime dataFim { get; set; }
 
+        public required Guid Paciente { get; set; }
+        public required Guid Medico { get; set; }
+        public required DateTime DataInicio { get; set; }
+        public required DateTime DataFim { get; set; }
+        public Agendamento(String Id, DateTime DataInicio, DateTime DataFim, String IdMedico, String IdPaciente)
+        {
+            this.Id = Guid.Parse(Id);
+            this.Paciente = Guid.Parse(IdPaciente);
+            this.Medico = Guid.Parse(IdMedico);
+            this.DataInicio = DataInicio;
+            this.DataFim = DataFim;
+        }
         public Agendamento(Guid paciente, Guid medico, DateTime dataInicio, DateTime dataFim)
         {
             SetId(Guid.NewGuid());
-            this.paciente = paciente;
-            this.medico = medico;
-            this.dataInicio = dataInicio;
-            this.dataFim = dataFim;
+            this.Paciente = paciente;
+            this.Medico = medico;
+            this.DataInicio = dataInicio;
+            this.DataFim = dataFim;
         }
     }
 }
