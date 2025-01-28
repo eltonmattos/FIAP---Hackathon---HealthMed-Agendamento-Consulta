@@ -4,6 +4,7 @@ API Backend para consulta, cadastro e notificações de Agendamentos de Consulta
 
 ## Requisitos
 
+
 ### Médico - Cadastro
 
 - Cadastro do Usuário (Médico): O médico deverá poder se cadastrar, preenchendo os campos obrigatórios: Nome, CPF, Número CRM, E-mail e Senha.
@@ -43,3 +44,7 @@ Corpo do e-mail:
 >Você tem uma nova consulta marcada! Paciente: {nome_do_paciente}.
 > 
 >Data e horário: {data} às {horário_agendado}.ˮ
+
+## Estrutura de Dados
+
+![image](https://github.com/user-attachments/assets/e50eae1a-7205-43ba-a8d5-c4881b2d76d7)
