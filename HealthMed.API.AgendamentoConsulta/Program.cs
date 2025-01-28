@@ -1,4 +1,5 @@
 using HealthMed.API.AgendamentoConsulta.Repository;
+using HealthMed.API.AgendamentoConsulta.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -12,6 +13,7 @@ builder.Services.AddScoped<MedicoRepository>();
 builder.Services.AddScoped<PacienteRepository>();
 builder.Services.AddScoped<AgendamentoRepository>();
 builder.Services.AddScoped<DisponibilidadeMedicoRepository>();
+builder.Services.AddTransient<IMailService, MailService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
