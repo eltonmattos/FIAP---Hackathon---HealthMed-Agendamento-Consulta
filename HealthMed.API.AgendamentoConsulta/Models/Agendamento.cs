@@ -1,4 +1,6 @@
-﻿namespace HealthMed.API.AgendamentoConsulta.Models
+﻿using System.Text.Json.Serialization;
+
+namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Agendamento
     {
@@ -25,6 +27,7 @@
             this.DataInicio = DataInicio;
             this.DataFim = DataFim;
         }
+        [JsonConstructor]
         public Agendamento(Guid paciente, Guid medico, DateTime dataInicio, DateTime dataFim)
         {
             SetId(Guid.NewGuid());

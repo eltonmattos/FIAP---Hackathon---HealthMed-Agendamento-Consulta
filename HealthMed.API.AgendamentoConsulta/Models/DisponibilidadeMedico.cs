@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
 {
@@ -29,7 +30,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.FimPeriodo = FimPeriodo;
             this.Validade = Validade;
         }
-
+        [JsonConstructor]
         public DisponibilidadeMedico(Guid idMedico, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
             SetId(Guid.NewGuid());

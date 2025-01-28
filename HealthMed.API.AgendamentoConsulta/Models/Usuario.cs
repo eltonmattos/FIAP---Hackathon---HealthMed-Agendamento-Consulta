@@ -1,4 +1,6 @@
-﻿namespace HealthMed.API.AgendamentoConsulta.Models
+﻿using System.Text.Json.Serialization;
+
+namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Usuario
     {
@@ -15,7 +17,7 @@
         public required string Nome { get; set; }
         public required string Email { get; set; }
         public required string Senha { get; set; }
-
+        [JsonConstructor]
         public Usuario()
         {
             SetId(Guid.NewGuid());

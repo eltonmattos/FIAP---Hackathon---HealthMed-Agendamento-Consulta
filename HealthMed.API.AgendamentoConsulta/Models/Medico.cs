@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
 {
@@ -16,7 +17,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             SetId(Guid.Parse(id));
             this.Nome = nome;
         }
-
+        [JsonConstructor]
         public Medico(string nome, string email, string CPF, string CRM, string senha, int? duracaoConsulta)
         {
             SetId(Guid.NewGuid());
