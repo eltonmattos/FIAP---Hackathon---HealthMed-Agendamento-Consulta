@@ -1,6 +1,6 @@
 ﻿using HealthMed.API.AgendamentoConsulta.Models;
 using System.Net.Mail;
-using HealthMed.API.AgendamentoConsulta.Database;
+using HealthMed.API.AgendamentoConsulta.Services;
 using Dapper;
 using System.Text;
 using System.Security.Cryptography;
@@ -25,10 +25,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             int duracaoConsulta = medico.DuracaoConsulta != null ? (int)medico.DuracaoConsulta : this._config.GetValue<int>("DuracaoConsultaPadrao");
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idMedico = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -44,11 +44,11 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     $" {duracaoConsulta} " +
                     $")");
 
-                sqldb.connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.connection);
+                sqldb.Connection.Open();
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
                 command.Parameters.AddWithValue("@Hash", SHA256.HashData(Encoding.UTF8.GetBytes(medico.Senha)));
                 command.ExecuteNonQuery();
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
                 return idMedico;
             }
         }
@@ -56,18 +56,18 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         public IEnumerable<object> Get()
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 var query = new StringBuilder();
                 query.Append(@$"SELECT [Id] ,[Nome] FROM [HealthMedAgendamento].[dbo].[Medico] ");
 
-                IEnumerable<Medico> result = sqldb.connection.Query<Medico>(
+                IEnumerable<Medico> result = sqldb.Connection.Query<Medico>(
                     query.ToString(), param: null);
 
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
 
                 List<object> getMedicos = [];
 
@@ -85,6 +85,27 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
+
+        public Medico? Get(String idMedico)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"SELECT [Nome],[CPF],[CRM],[Email],[DuracaoConsulta]
+                              FROM [HealthMedAgendamento].[dbo].[Medico] WHERE [Id] = '{idMedico}' ");
+
+                IEnumerable<Medico> result = sqldb.Connection.Query<Medico>(query.ToString(), param: null);
+
+                sqldb.Connection.Close();
+
+                return result.FirstOrDefault();
+            }
+        }
+
         public Guid HorarioDisponivel(Medico medico)
         {
             UsuarioRepository.ValidateEmail(medico.Email);
@@ -96,10 +117,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             int duracaoConsulta = medico.DuracaoConsulta != null ? (int)medico.DuracaoConsulta : this._config.GetValue<int>("DuracaoConsultaPadrao");
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idMedico = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -115,11 +136,11 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     $" {duracaoConsulta} " +
                     $")");
 
-                sqldb.connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.connection);
+                sqldb.Connection.Open();
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
                 command.Parameters.AddWithValue("@Hash", SHA256.HashData(Encoding.UTF8.GetBytes(medico.Senha)));
                 command.ExecuteNonQuery();
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
                 return idMedico;
             }
         }
@@ -130,10 +151,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idPaciente = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -141,7 +162,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.Medico ");
                 query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
 
-                String? result = sqldb.connection?.QueryFirstOrDefault<String>(query.ToString());
+                String? result = sqldb.Connection?.QueryFirstOrDefault<String>(query.ToString());
 
                 return result;
             }
@@ -161,10 +182,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idPaciente = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -172,7 +193,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.Medico ");
                 query.Append($"WHERE [Email] = '{email}' OR [CPF] = '{cpf}'");
 
-                String? result = sqldb.connection?.QueryFirstOrDefault<String>(query.ToString());
+                String? result = sqldb.Connection?.QueryFirstOrDefault<String>(query.ToString());
 
                 if (result != null)
                     throw new Exception("Médico já cadastrado");

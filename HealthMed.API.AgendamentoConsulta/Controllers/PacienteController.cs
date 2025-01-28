@@ -14,22 +14,18 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         private readonly PacienteRepository _pacienteRepository = pacienteRepository;
 
         //// GET: PacienteController
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
-
-        //// GET: PacienteController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
-
-        //// GET: PacienteController/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
+        /// <summary>
+        /// Obter Paciente por Id
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("/api/Paciente/{idPaciente}")]
+        public IActionResult Get(String idPaciente)
+        {
+            Paciente? paciente = _pacienteRepository.Get(idPaciente);
+            return Ok(paciente);
+        }
 
         // POST: api/<PacienteController>
         /// <summary>
@@ -37,7 +33,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("/api/Paciente/")]
         public IActionResult Post([FromBody] Paciente value)
         {
             Guid idPaciente = _pacienteRepository.Post(value);
@@ -48,62 +44,5 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
                 Id = idPaciente
             });
         }
-
-        //// POST: PacienteController/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: PacienteController/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: PacienteController/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: PacienteController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: PacienteController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

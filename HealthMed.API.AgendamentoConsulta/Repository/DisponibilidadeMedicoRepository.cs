@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using HealthMed.API.AgendamentoConsulta.Database;
+using HealthMed.API.AgendamentoConsulta.Services;
 using HealthMed.API.AgendamentoConsulta.Models;
 using Microsoft.Data.SqlClient;
 using System.Text;
@@ -16,10 +16,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idDisponibilidadeMedico = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -40,25 +40,22 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                             '{disponibilidadeMedico.Medico}'
                             )");
 
-                sqldb.connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.connection);
+                sqldb.Connection.Open();
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
                 command.ExecuteNonQuery();
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
                 return idDisponibilidadeMedico;
             }
         }
-
-
-        public Guid Put(String idMedico, DisponibilidadeMedico disponibilidadeMedico)
+        public void Put(String idMedico, String idDisponibilidadeMedico, DisponibilidadeMedico disponibilidadeMedico)
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
-                Guid idDisponibilidadeMedico = Guid.NewGuid();
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
                 query.Append($@"INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
@@ -77,12 +74,12 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                             '{disponibilidadeMedico.Medico}'
                             )");
                 query.Append($"WHERE IdMedico = '{idMedico}'");
+                query.Append($"AND Id = '{idDisponibilidadeMedico}'");
 
-                sqldb.connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.connection);
+                sqldb.Connection.Open();
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
                 command.ExecuteNonQuery();
-                sqldb.connection.Close();
-                return idDisponibilidadeMedico;
+                sqldb.Connection.Close();
             }
         }
 
@@ -91,10 +88,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 Guid idDisponibilidadeMedico = Guid.NewGuid();
                 var query = new StringBuilder();
@@ -108,10 +105,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                               FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico]");
                 query.Append($"WHERE IdMedico = '{idMedico}'");
 
-                IEnumerable<DisponibilidadeMedico> result = sqldb.connection.Query<DisponibilidadeMedico>(
+                IEnumerable<DisponibilidadeMedico> result = sqldb.Connection.Query<DisponibilidadeMedico>(
                     query.ToString(), param: null);
 
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
                 return result;
             }
         }
@@ -120,10 +117,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
-            if (sqldb == null || sqldb.connection == null)
+            if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
-            using (sqldb.connection)
+            using (sqldb.Connection)
             {
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
@@ -137,10 +134,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 query.Append($"WHERE IdMedico = '{idMedico}'");
                 query.Append($"AND CAST(InicioPeriodo AS DATE) = '{data.ToString("yyyy-MM-dd")}'");
 
-                IEnumerable<DisponibilidadeMedico> result = sqldb.connection.Query<DisponibilidadeMedico>(
+                IEnumerable<DisponibilidadeMedico> result = sqldb.Connection.Query<DisponibilidadeMedico>(
                     query.ToString(), param: null);
 
-                sqldb.connection.Close();
+                sqldb.Connection.Close();
                 return result;
             }
 

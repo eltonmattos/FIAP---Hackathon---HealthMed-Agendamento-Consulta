@@ -26,6 +26,20 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
             return Ok(medicos);
         }
 
+        //// GET: MedicoController
+        /// <summary>
+        /// Obter Medico por Id
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        //[Authorize]
+        [HttpGet("/api/Medico/{idMedico}")]
+        public IActionResult Get(String idMedico)
+        {
+            Medico? medico = _medicoRepository.Get(idMedico);
+            return Ok(medico);
+        }
+
         //// GET: MedicoController/Details/5
         //public ActionResult Details(int id)
         //{

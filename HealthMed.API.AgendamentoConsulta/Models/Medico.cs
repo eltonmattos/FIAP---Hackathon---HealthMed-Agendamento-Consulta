@@ -17,6 +17,16 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             SetId(Guid.Parse(id));
             this.Nome = nome;
         }
+        public Medico(String Nome, String CPF, String CRM, String Email, Int32 DuracaoConsulta)
+        {
+            SetId(Guid.NewGuid());
+            this.Nome = Nome;
+            this.CPF = CPF;
+            this.CRM = CRM;
+            this.Email = Email;
+            this.DuracaoConsulta = DuracaoConsulta;
+        }
+
         [JsonConstructor]
         public Medico(string nome, string email, string CPF, string CRM, string senha, int? duracaoConsulta)
         {

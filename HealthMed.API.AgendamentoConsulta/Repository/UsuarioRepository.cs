@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Azure.Identity;
-using HealthMed.API.AgendamentoConsulta.Database;
+using HealthMed.API.AgendamentoConsulta.Services;
 using HealthMed.API.AgendamentoConsulta.Models;
 using Microsoft.Data.SqlClient;
 
