@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
-    public class TestHelpers
+    public class TestHelpers()
     {
         public static readonly HttpClient _httpClient = new() { BaseAddress = new Uri("https://localhost:7013") };
         private const string _jsonMediaType = "application/json";
@@ -22,6 +23,13 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.Equal(expectedContent, await JsonSerializer.DeserializeAsync<T?>(
                 await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions));
+        }
+
+        public static IConfiguration GetConfiguration()
+        {
+            return new ConfigurationBuilder()
+                .AddJsonFile(Path.GetFullPath("..\\..\\..\\..\\HealthMed.API.AgendamentoConsulta\\appsettings.json"))
+                .Build();
         }
 
         public static StringContent GetJsonStringContent<T>(T model)

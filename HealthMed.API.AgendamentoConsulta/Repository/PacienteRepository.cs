@@ -70,6 +70,26 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 return result.FirstOrDefault();
             }
         }
+
+
+        public void Delete(String email)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[Paciente] WHERE [Email] = '{email}' ");
+
+                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
+
+                sqldb.Connection.Close();
+            }
+        }
+
+
         public String? GetToken(String email, String senha)
         {
             UsuarioRepository.ValidateEmail(email);

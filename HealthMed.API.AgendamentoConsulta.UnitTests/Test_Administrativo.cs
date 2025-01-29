@@ -1,4 +1,7 @@
 using HealthMed.API.AgendamentoConsulta.Models;
+using HealthMed.API.AgendamentoConsulta.Repository;
+using HealthMed.API.AgendamentoConsulta.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System.Diagnostics;
 using System.Text;
@@ -23,6 +26,10 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email!= null)
+                pacienteRepository.Delete(email: paciente.Email);
 
         }
 
