@@ -16,6 +16,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid Post(Paciente paciente)
         {
+            if (paciente.Email == null || paciente.CPF == null || paciente.Senha == null)
+                throw new Exception("Dados inválidos");
             UsuarioRepository.ValidateEmail(paciente.Email);
             UsuarioRepository.ValidateCPF(paciente.CPF);
             UsuarioRepository.ValidatePassword(paciente.Senha);

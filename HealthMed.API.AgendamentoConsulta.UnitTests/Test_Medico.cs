@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
-    public class Medico
+    public class Test_Medico
     {
         [Fact]
         public void EfetuaLoginComSucesso()

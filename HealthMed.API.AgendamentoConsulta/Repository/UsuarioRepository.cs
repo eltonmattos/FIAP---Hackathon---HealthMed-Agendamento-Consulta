@@ -34,7 +34,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             {
                 try
                 {
-                    MailAddress m = new MailAddress(email);
+                    MailAddress m = new(email);
                 }
                 catch (FormatException)
                 {

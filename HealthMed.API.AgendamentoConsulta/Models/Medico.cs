@@ -8,8 +8,8 @@ namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Medico : Usuario
     {
-        public required string CPF { get; set; }
-        public required string CRM { get; set; }
+        public string? CPF { get; set; }
+        public string? CRM { get; set; }
         public int? DuracaoConsulta { get; set; }
 
         public Medico(String id, String nome)

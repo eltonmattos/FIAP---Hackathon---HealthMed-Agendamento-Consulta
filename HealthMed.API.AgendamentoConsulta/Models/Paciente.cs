@@ -7,7 +7,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Paciente : Usuario
     {
-        public required string CPF { get; set; }
+        public string CPF { get; set; }
 
         public Paciente(String Nome, String CPF, String Email)
         {
