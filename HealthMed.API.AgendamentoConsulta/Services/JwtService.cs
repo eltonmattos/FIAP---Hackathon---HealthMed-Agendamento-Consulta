@@ -20,7 +20,7 @@ public class JwtService
         _expirationMinutes = int.Parse(config["JwtSettings:ExpirationMinutes"]);
     }
 
-    public string GenerateToken(string email)
+    public string GenerateToken(string email, string role)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_secret);
@@ -29,7 +29,8 @@ public class JwtService
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Email, email)
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, role)
             }),
             Expires = DateTime.UtcNow.AddMinutes(_expirationMinutes),
             Issuer = _issuer,

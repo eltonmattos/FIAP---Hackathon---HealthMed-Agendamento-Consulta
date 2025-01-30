@@ -50,6 +50,10 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         [HttpPost("LoginMedico")]
         public IActionResult LoginMedico(string email, string password)
         {
+            var medico = _medicoRepository.GetToken(email, password, true);
+            if (medico == null)
+                return Unauthorized(new { message = "Usuário ou senha inválida." });
+
             string? token = _medicoRepository.GetToken(email, password, true); // true = Médico
 
             if (!string.IsNullOrEmpty(token))
@@ -62,11 +66,15 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
             return Unauthorized(new { message = "Usuário ou senha inválida." });
         }
 
-
+        
         [HttpPost("LoginPaciente")]
         public IActionResult LoginPaciente(string email, string password)
         {
-            string? token = _medicoRepository.GetToken(email, password, false); // false = Paciente
+            var paciente = _medicoRepository.GetToken(email, password, false);
+            if (paciente == null)
+                return Unauthorized(new { message = "Usuário ou senha inválida." });
+
+            string? token = _pacienteRepository.GetToken(email, password, false); // false = Paciente
 
             if (!string.IsNullOrEmpty(token))
             {

@@ -19,7 +19,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Paciente")]
         [HttpGet("/api/Medico/")]
         public IActionResult Get()
         {

@@ -173,7 +173,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     string role = isMedico ? "Medico" : "Paciente";
 
                     var jwtService = new JwtService(_config);
-                    return jwtService.GenerateToken(email);
+                    return jwtService.GenerateToken(email, role);
                 }
 
                 return null;

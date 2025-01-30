@@ -20,7 +20,8 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        [Authorize]
+        [Authorize(Roles = "Paciente")]
+
         [HttpPost("/api/Agendamento/")]
         public IActionResult Post([FromBody] Agendamento value)
         {
@@ -40,6 +41,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <returns></returns>
         //[Authorize]
         [HttpGet("/api/Agendamento/{idMedico}")]
+        [Authorize(Roles = "Medico")]
         public IActionResult Get(String idMedico)
         {
             IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get(idMedico);
