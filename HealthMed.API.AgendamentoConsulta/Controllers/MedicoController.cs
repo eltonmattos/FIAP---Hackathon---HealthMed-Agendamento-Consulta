@@ -1,5 +1,6 @@
 ﻿using HealthMed.API.AgendamentoConsulta.Models;
 using HealthMed.API.AgendamentoConsulta.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,9 +33,9 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        //[Authorize]
+        //[Authorize] 
         [HttpGet("/api/Medico/{idMedico}")]
-        public IActionResult Get(String idMedico)
+        public IActionResult Get(string idMedico)
         {
             Medico? medico = _medicoRepository.Get(idMedico);
             return Ok(medico);

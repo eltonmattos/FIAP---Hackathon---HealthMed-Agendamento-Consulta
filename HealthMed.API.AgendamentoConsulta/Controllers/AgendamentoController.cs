@@ -20,7 +20,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize]
         [HttpPost("/api/Agendamento/")]
         public IActionResult Post([FromBody] Agendamento value)
         {

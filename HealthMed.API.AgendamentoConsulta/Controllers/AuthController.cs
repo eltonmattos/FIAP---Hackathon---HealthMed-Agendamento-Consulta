@@ -48,38 +48,35 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         }
 
         [HttpPost("LoginMedico")]
-        public IActionResult LoginMedico(String email, String password)
+        public IActionResult LoginMedico(string email, string password)
         {
-            String? token = _medicoRepository.GetToken(email, password);
+            string? token = _medicoRepository.GetToken(email, password, true); // true = Médico
 
-            if (!String.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
-                if (Guid.Parse(token) != Guid.Empty)
-                {
-                    _logger.LogInformation("Médico logado com sucesso.");
-                    return Ok(token);
-                }
-
-                    //var token = generatejwttoken(user.username);
-                    //return ok(new { token });
+                _logger.LogInformation("Médico logado com sucesso.");
+                return Ok(new { token });
             }
+
             _logger.LogError("Usuário ou senha inválida.");
-            return Unauthorized("Usuário ou senha inválida.");
+            return Unauthorized(new { message = "Usuário ou senha inválida." });
         }
+
 
         [HttpPost("LoginPaciente")]
-        public IActionResult LoginPaciente(String email, String password)
+        public IActionResult LoginPaciente(string email, string password)
         {
-            String? token = _pacienteRepository.GetToken(email, password);
-            
-            if (!String.IsNullOrEmpty(token))
+            string? token = _medicoRepository.GetToken(email, password, false); // false = Paciente
+
+            if (!string.IsNullOrEmpty(token))
             {
-                if (Guid.Parse(token) != Guid.Empty)
-                    return Ok(token);
-                    //var token = generatejwttoken(user.username);
-                    //return ok(new { token });
+                _logger.LogInformation("Paciente logado com sucesso.");
+                return Ok(new { token });
             }
-            return Unauthorized("Usuário ou senha inválida.");
+
+            _logger.LogError("Usuário ou senha inválida.");
+            return Unauthorized(new { message = "Usuário ou senha inválida." });
         }
+
     }
 }
