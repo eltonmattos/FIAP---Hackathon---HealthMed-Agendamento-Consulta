@@ -11,10 +11,8 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
     public class Test_Administrativo: IDisposable
     {
-        
-
         [Fact]
-        public async void POSTPaciente_PacienteCadastradoComSucesso()
+        public async void Paciente_POST_PacienteCadastradoComSucesso()
         {
             Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "P@ssw0rd");
             var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
@@ -34,74 +32,133 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         }
 
         [Fact]
-        public void CadastrarPaciente_CPFJaExiste()
+        public async void Paciente_POST_CadastrarPaciente_CPFJaExiste()
+        {
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = paciente;
+            var expectedContent = "Paciente cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email != null)
+                pacienteRepository.Delete(email: paciente.Email);
+        }
+
+        [Fact]
+        public async void Paciente_POST_CadastrarPaciente_CPFInvalido()
+        {
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = paciente;
+            var expectedContent = "Paciente cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email != null)
+                pacienteRepository.Delete(email: paciente.Email);
+        }
+
+
+        [Fact]
+        public async void Paciente_POST_CadastrarPaciente_EmailJaExiste()
+        {
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = paciente;
+            var expectedContent = "Paciente cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email != null)
+                pacienteRepository.Delete(email: paciente.Email);
+        }
+
+        [Fact]
+        public async void Paciente_POST_CadastrarPaciente_FormatoEmailInvalido()
+        {
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331gmail.com", "73121929045", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = paciente;
+            var expectedContent = "Paciente cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email != null)
+                pacienteRepository.Delete(email: paciente.Email);
+        }
+
+        [Fact]
+        public async void Paciente_POST_CadastrarPaciente_SenhaInvalida()
+        {
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "123");
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = paciente;
+            var expectedContent = "Paciente cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
+            if (paciente.Email != null)
+                pacienteRepository.Delete(email: paciente.Email);
+        }
+
+        [Fact]
+        public void Medico_POST_MedicoCadastradoComSucesso()
         {
 
         }
 
         [Fact]
-        public void CadastrarPaciente_CPFInvalido()
-        {
-
-        }
-
-
-        [Fact]
-        public void CadastrarPaciente_EmailJaExiste()
+        public void Medico_POST_CadastrarMedico_CPFJaExiste()
         {
 
         }
 
         [Fact]
-        public void CadastrarPaciente_FormatoEmailInvalido()
+        public void Medico_POST_CadastrarMedico_CPFInvalido()
         {
 
         }
 
         [Fact]
-        public void CadastrarPaciente_SenhaInvalida()
+        public void Medico_POST_CadastrarMedico_EmailJaExiste()
         {
 
         }
 
         [Fact]
-        public void MedicoCadastrado()
+        public void Medico_POST_CadastrarMedico_SenhaInvalida()
         {
 
         }
 
         [Fact]
-        public void CadastrarMedico_CPFJaExiste()
-        {
-
-        }
-
-        [Fact]
-        public void CadastrarMedico_CPFInvalido()
-        {
-
-        }
-
-        [Fact]
-        public void CadastrarMedico_EmailJaExiste()
-        {
-
-        }
-
-        [Fact]
-        public void CadastrarMedico_SenhaInvalida()
-        {
-
-        }
-
-        [Fact]
-        public void MedicoCadastrado_FormatoEmailInvalido()
-        {
-
-        }
-
-        [Fact]
-        public void EmailAgendamentoEnviado()
+        public void Medico_POST_CadastrarMedico_FormatoEmailInvalido()
         {
 
         }
