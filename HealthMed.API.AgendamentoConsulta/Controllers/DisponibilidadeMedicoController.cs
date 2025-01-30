@@ -19,7 +19,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="idMedico"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Paciente")]
         [HttpGet("/api/DisponibilidadeMedico/{idMedico}")]
         public IActionResult Get(String idMedico)
         {
@@ -33,7 +33,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Medico")]
         [HttpPost("/api/DisponibilidadeMedico/")]
         public IActionResult Post([FromBody] DisponibilidadeMedico value)
         {
@@ -48,13 +48,13 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
 
         // PUT: DisponibilidadeMedicoController
         /// <summary>
-        /// Cadastrar Horários de Disponibilidade do Médico
+        /// Editar Horários de Disponibilidade do Médico
         /// </summary>
         /// <param name="idMedico"></param>
         /// <param name="idDisponibilidadeMedico"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize(Roles = "Medico")]
         [HttpPut("/api/DisponibilidadeMedico/{idMedico}/{idDisponibilidadeMedico}")]
         public IActionResult Put(String idMedico, String idDisponibilidadeMedico, [FromBody] DisponibilidadeMedico value)
         {

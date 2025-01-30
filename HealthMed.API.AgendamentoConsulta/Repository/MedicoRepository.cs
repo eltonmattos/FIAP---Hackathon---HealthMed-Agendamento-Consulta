@@ -145,10 +145,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public String? GetToken(String email, String senha)
+        public string? GetToken(string email, string senha, bool isMedico)
         {
             UsuarioRepository.ValidateEmail(email);
-            
+
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
             if (sqldb == null || sqldb.Connection == null)
@@ -156,17 +156,30 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             using (sqldb.Connection)
             {
-                Guid idPaciente = Guid.NewGuid();
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
-                query.Append($"SELECT [Id] FROM {dbname}.dbo.Medico ");
-                query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
 
-                String? result = sqldb.Connection?.QueryFirstOrDefault<String>(query.ToString());
+                // Define a tabela conforme o tipo de usuário
+                string tableName = isMedico ? "Medico" : "Paciente";
 
-                return result;
+                query.Append($"SELECT [Id] FROM {dbname}.dbo.{tableName} ");
+                query.Append($"WHERE [Email] = '{email}'");// AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
+
+                string? userId = sqldb.Connection?.QueryFirstOrDefault<string?>(query.ToString());
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    // Define a role com base no tipo de usuário
+                    string role = isMedico ? "Medico" : "Paciente";
+
+                    var jwtService = new JwtService(_config);
+                    return jwtService.GenerateToken(email, role);
+                }
+
+                return null;
             }
         }
+
 
         /// <summary>
         /// Valida se o médico existe no banco de dados, a partir do email + CPF
