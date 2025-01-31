@@ -1,40 +1,32 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using System;
 using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class DisponibilidadeMedico
     {
-        protected Guid Id { get; set; }
-        public Guid GetId()
-        {
-            return Id;
-        }
-
-        protected void SetId(Guid value)
-        {
-            Id = value;
-        }
+        public Guid Id { get; set; } 
         public required Guid Medico { get; set; }
         public required int DiaSemana { get; set; }
         public required TimeSpan InicioPeriodo { get; set; }
         public required TimeSpan FimPeriodo { get; set; }
         public required DateTime Validade { get; set; }
 
-        public DisponibilidadeMedico(String Id, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade, String IdMedico)
+        public DisponibilidadeMedico(Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
-            this.Id = Guid.Parse(Id);
-            this.Medico = Guid.Parse(IdMedico);
+            this.Id = Guid.NewGuid();
+            this.Medico = Medico;
             this.DiaSemana = DiaSemana;
             this.InicioPeriodo = InicioPeriodo;
             this.FimPeriodo = FimPeriodo;
             this.Validade = Validade;
         }
+
         [JsonConstructor]
-        public DisponibilidadeMedico(Guid idMedico, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
+        public DisponibilidadeMedico(Guid Id, Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
-            SetId(Guid.NewGuid());
-            this.Medico = idMedico;
+            this.Id = Id;
+            this.Medico = Medico;
             this.DiaSemana = DiaSemana;
             this.InicioPeriodo = InicioPeriodo;
             this.FimPeriodo = FimPeriodo;

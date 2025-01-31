@@ -107,7 +107,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 string tableName = isMedico ? "Medico" : "Paciente";
 
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.{tableName} ");
-                query.Append($"WHERE [Email] = '{email}'");// AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
+                query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
 
                 string? userId = sqldb.Connection?.QueryFirstOrDefault<string?>(query.ToString());
 

@@ -22,26 +22,24 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             using (sqldb.Connection)
             {
                 Guid idDisponibilidadeMedico = Guid.NewGuid();
-                var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
-                query.Append($@"INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
-                            ([Id],
-                            [DiaSemana],
-                            [InicioPeriodo],
-                            [FimPeriodo],
-                            [Validade],
-                            [IdMedico]) 
-                            VALUES (
-                            '{idDisponibilidadeMedico}',
-                            {disponibilidadeMedico.DiaSemana},
-                            '{disponibilidadeMedico.InicioPeriodo}', 
-                            '{disponibilidadeMedico.FimPeriodo}', 
-                            '{disponibilidadeMedico.Validade.Date.ToString()}', 
-                            '{disponibilidadeMedico.Medico}'
-                            )");
+
+                string query = $@"
+                                    INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
+                                        ([Id], [DiaSemana], [InicioPeriodo], [FimPeriodo], [Validade], [IdMedico]) 
+                                    VALUES 
+                                        (@Id, @DiaSemana, @InicioPeriodo, @FimPeriodo, @Validade, @IdMedico)";
 
                 sqldb.Connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.Connection);
+                SqlCommand command = new(query, sqldb.Connection);
+
+                command.Parameters.AddWithValue("@Id", idDisponibilidadeMedico);
+                command.Parameters.AddWithValue("@DiaSemana", disponibilidadeMedico.DiaSemana);
+                command.Parameters.AddWithValue("@InicioPeriodo", disponibilidadeMedico.InicioPeriodo);
+                command.Parameters.AddWithValue("@FimPeriodo", disponibilidadeMedico.FimPeriodo);
+                command.Parameters.AddWithValue("@Validade", disponibilidadeMedico.Validade.ToString("yyyy-MM-dd HH:mm:ss")); 
+                command.Parameters.AddWithValue("@IdMedico", disponibilidadeMedico.Medico);
+
                 command.ExecuteNonQuery();
                 sqldb.Connection.Close();
                 return idDisponibilidadeMedico;
