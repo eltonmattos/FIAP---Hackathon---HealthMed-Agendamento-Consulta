@@ -1,40 +1,34 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Agendamento
     {
-        protected Guid Id { get; set; }
-        public Guid GetId()
-        {
-            return Id;
-        }
-
-        protected void SetId(Guid value)
-        {
-            Id = value;
-        }
-
-        public required Guid Paciente { get; set; }
-        public required Guid Medico { get; set; }
+        public Guid Id { get; set; }
+        public required Guid IdPaciente { get; set; }
+        public required Guid IdMedico { get; set; }
         public required DateTime DataInicio { get; set; }
         public required DateTime DataFim { get; set; }
-        public Agendamento(String Id, DateTime DataInicio, DateTime DataFim, String IdMedico, String IdPaciente)
+
+        [SetsRequiredMembers]
+        public Agendamento(DateTime DataInicio, DateTime DataFim, Guid IdMedico, Guid IdPaciente)
         {
-            this.Id = Guid.Parse(Id);
-            this.Paciente = Guid.Parse(IdPaciente);
-            this.Medico = Guid.Parse(IdMedico);
+            this.Id = Guid.NewGuid();
+            this.IdPaciente = IdPaciente;
+            this.IdMedico = IdMedico;
             this.DataInicio = DataInicio;
             this.DataFim = DataFim;
         }
+
         [JsonConstructor]
-        public Agendamento(Guid paciente, Guid medico, DateTime dataInicio, DateTime dataFim)
+        public Agendamento(String Id, DateTime DataInicio, DateTime DataFim, String IdMedico, String IdPaciente)
         {
-            SetId(Guid.NewGuid());
-            this.Paciente = paciente;
-            this.Medico = medico;
-            this.DataInicio = dataInicio;
-            this.DataFim = dataFim;
+            this.Id = new Guid(Id);
+            this.IdPaciente = new Guid(IdPaciente);
+            this.IdMedico = new Guid(IdMedico);
+            this.DataInicio = DataInicio;
+            this.DataFim = DataFim;
         }
     }
 }

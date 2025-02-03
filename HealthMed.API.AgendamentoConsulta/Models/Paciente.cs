@@ -1,4 +1,5 @@
 ﻿using HealthMed.API.AgendamentoConsulta.Repository;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -9,6 +10,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
     {
         public string CPF { get; set; }
 
+        [SetsRequiredMembers]
         public Paciente(String Nome, String CPF, String Email)
         {
             SetId(System.Guid.NewGuid());

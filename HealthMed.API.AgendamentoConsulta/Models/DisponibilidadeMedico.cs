@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
@@ -7,7 +6,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
     public class DisponibilidadeMedico
     {
         public Guid Id { get; set; } 
-        public required Guid Medico { get; set; }
+        public required Guid IdMedico { get; set; }
         public required int DiaSemana { get; set; }
         public required TimeSpan InicioPeriodo { get; set; }
         public required TimeSpan FimPeriodo { get; set; }
@@ -17,7 +16,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public DisponibilidadeMedico(Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
             this.Id = Guid.NewGuid();
-            this.Medico = Medico;
+            this.IdMedico = Medico;
             this.DiaSemana = DiaSemana;
             this.InicioPeriodo = InicioPeriodo;
             this.FimPeriodo = FimPeriodo;
@@ -25,10 +24,10 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         }
 
         [JsonConstructor]
-        public DisponibilidadeMedico(Guid Id, Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
+        public DisponibilidadeMedico(String Id, Int32 DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade, String IdMedico)
         {
-            this.Id = Id;
-            this.Medico = Medico;
+            this.Id = new Guid(Id);
+            this.IdMedico = new Guid(IdMedico);
             this.DiaSemana = DiaSemana;
             this.InicioPeriodo = InicioPeriodo;
             this.FimPeriodo = FimPeriodo;

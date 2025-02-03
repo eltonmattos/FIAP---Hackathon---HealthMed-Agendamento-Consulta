@@ -41,7 +41,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 command.Parameters.AddWithValue("@InicioPeriodo", disponibilidadeMedico.InicioPeriodo);
                 command.Parameters.AddWithValue("@FimPeriodo", disponibilidadeMedico.FimPeriodo);
                 command.Parameters.AddWithValue("@Validade", disponibilidadeMedico.Validade.ToString("yyyy-MM-dd HH:mm:ss"));
-                command.Parameters.AddWithValue("@IdMedico", disponibilidadeMedico.Medico);
+                command.Parameters.AddWithValue("@IdMedico", disponibilidadeMedico.IdMedico);
 
                 command.ExecuteNonQuery();
                 sqldb.Connection.Close();

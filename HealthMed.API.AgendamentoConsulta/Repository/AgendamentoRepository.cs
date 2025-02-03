@@ -45,8 +45,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     '{idAgendamento}',
                     '{agendamento.DataInicio.ToString("s")}',
                     '{agendamento.DataFim.ToString("s")}',
-                    '{agendamento.Medico}',
-                    '{agendamento.Paciente}'
+                    '{agendamento.IdMedico}',
+                    '{agendamento.IdPaciente}'
                 )");
 
                 sqldb.Connection.Open();
@@ -109,11 +109,29 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
+
+        public void Delete(Guid idAgendamento)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[Agendamento] WHERE [Id] = '{idAgendamento.ToString()}' ");
+
+                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
+
+                sqldb.Connection.Close();
+            }
+        }
+
         private bool VerificarDisponibilidadeMedico(Agendamento agendamento)
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(this._config);
             IEnumerable<DisponibilidadeMedico> horariosDisponiveisMedico = [];
-            disponibilidadeMedicoRepository.Get(agendamento.Medico.ToString());
+            disponibilidadeMedicoRepository.Get(agendamento.IdMedico.ToString());
 
             int DiaSemana = (int)agendamento.DataInicio.DayOfWeek;
 
@@ -130,7 +148,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         private bool VerificarAgendamentosMedico(Agendamento agendamento)
         {
-            IEnumerable<Agendamento> agendamentos = this.Get(agendamento.Medico.ToString(), agendamento.DataInicio);
+            IEnumerable<Agendamento> agendamentos = this.Get(agendamento.IdMedico.ToString(), agendamento.DataInicio);
 
             foreach (Agendamento a in agendamentos)
             {
@@ -155,10 +173,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         public async void NotificarAgendamento(Agendamento agendamento)
         {
             PacienteRepository pacienteRepository = new(this._config);
-            Paciente? paciente = pacienteRepository.Get(agendamento.Paciente.ToString());
+            Paciente? paciente = pacienteRepository.Get(agendamento.IdPaciente.ToString());
 
             MedicoRepository medicoRepository = new(this._config);
-            Medico? medico = medicoRepository.Get(agendamento.Medico.ToString());
+            Medico? medico = medicoRepository.Get(agendamento.IdMedico.ToString());
 
             if (paciente!= null && medico != null)
             {

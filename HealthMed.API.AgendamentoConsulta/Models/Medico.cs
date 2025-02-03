@@ -1,4 +1,5 @@
 ﻿using HealthMed.API.AgendamentoConsulta.Repository;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,6 +18,8 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             SetId(Guid.Parse(id));
             this.Nome = nome;
         }
+
+        [SetsRequiredMembers]
         public Medico(String Nome, String CPF, String CRM, String Email, Int32 DuracaoConsulta)
         {
             SetId(Guid.NewGuid());
