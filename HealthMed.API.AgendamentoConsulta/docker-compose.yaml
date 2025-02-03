@@ -1,25 +1,11 @@
-﻿services:
-
-  webapi:
-    build:
-      context: .  # Path to the directory containing the Dockerfile
-      dockerfile: Dockerfile  # Name of the Dockerfile
-    ports:
-      - "8080:80"  # Map port 8080 on the host to port 80 in the container
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production  # Set environment variables if needed
-    networks:
-      - webnet  # Use a custom network
-
-networks:
-  webnet:  # Define a custom network
-
+﻿version: '3.7'
+services:
   # sql-server:
   #   container_name: sql-server
   #   environment:
   #     ACCEPT_EULA: Y
-  #     SA_PASSWORD: a688et6zar
-  #     attach_dbs: "[{'dbName':'HealthMedAgendamento','dbFiles':['/var/opt/mssql/data/TechChallenge.mdf' , '/var/opt/mssql/data/TechChallenge_log.ldf']}]"
+  #     SA_PASSWORD: EM$2303bd
+  #     attach_dbs: "[{'dbName':'TechChallenge','dbFiles':['/var/opt/mssql/data/TechChallenge.mdf' , '/var/opt/mssql/data/TechChallenge_log.ldf']}]"
   #   image: mcr.microsoft.com/mssql/server:latest
   #   restart: always
   #   healthcheck:
@@ -33,12 +19,12 @@ networks:
   #   volumes:
   #     - C:\Data/SQLServerData:/var/opt/mssql/data
     
-  # api:
-  #   container_name: healthmed_agendamento
-  #   image: eltonmattos/healthmed_agendamento:latest
-  #   ports:
-  #     - "80:80"
-
-# networks:
-#   localprom:
-#     driver: bridge
+  api:
+    container_name: fiap-healthmed_agendamento
+    image: eltonmattos/healthmed_agendamento:latest
+    ports:
+      - "80:80"
+      
+networks:
+  localprom:
+    driver: bridge

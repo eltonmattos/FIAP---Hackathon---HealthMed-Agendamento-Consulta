@@ -34,133 +34,179 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Paciente_POST_CadastrarPaciente_CPFJaExiste()
         {
-            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "P@ssw0rd");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "52998224725", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = paciente;
-            var expectedContent = "Paciente cadastrado com sucesso.";
+            var expectedContent = "Paciente já cadastrado";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            if (paciente.Email != null)
-                pacienteRepository.Delete(email: paciente.Email);
         }
 
         [Fact]
         public async void Paciente_POST_CadastrarPaciente_CPFInvalido()
         {
             Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "P@ssw0rd");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = paciente;
-            var expectedContent = "Paciente cadastrado com sucesso.";
+            var expectedContent = "CPF inválido";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            if (paciente.Email != null)
-                pacienteRepository.Delete(email: paciente.Email);
         }
 
 
         [Fact]
         public async void Paciente_POST_CadastrarPaciente_EmailJaExiste()
         {
-            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "P@ssw0rd");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            Paciente paciente = new("Raphael Ribeiro", "ana.pereira@example.com", "73121929046", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = paciente;
-            var expectedContent = "Paciente cadastrado com sucesso.";
+            var expectedContent = "Paciente já cadastrado";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            if (paciente.Email != null)
-                pacienteRepository.Delete(email: paciente.Email);
         }
 
         [Fact]
         public async void Paciente_POST_CadastrarPaciente_FormatoEmailInvalido()
         {
-            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331gmail.com", "73121929045", "P@ssw0rd");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331gmail.com", "73121929046", "P@ssw0rd");
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = paciente;
-            var expectedContent = "Paciente cadastrado com sucesso.";
+            var expectedContent = "Email inválido";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            if (paciente.Email != null)
-                pacienteRepository.Delete(email: paciente.Email);
         }
 
         [Fact]
         public async void Paciente_POST_CadastrarPaciente_SenhaInvalida()
         {
-            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929045", "123");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "123");
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = paciente;
-            var expectedContent = "Paciente cadastrado com sucesso.";
+            var expectedContent = @"Comprimento mínimo: A senha deve ser composta de:
+                                            - Pelo menos 8 caracteres.
+                                            - Pelo menos uma letra maiúscula.
+                                            - Pelo menos uma letra minúscula.
+                                            - Pelo menos um número.";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Paciente/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            if (paciente.Email != null)
-                pacienteRepository.Delete(email: paciente.Email);
         }
 
         [Fact]
-        public void Medico_POST_MedicoCadastradoComSucesso()
+        public async void Medico_POST_MedicoCadastradoComSucesso()
         {
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039892", "CRM/01234", "P@ssw0rd", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var sendContent = medico;
+            var expectedContent = "Médico cadastrado com sucesso.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
 
+            MedicoRepository medicoRepository = new(TestHelpers.GetConfiguration());
+            if (medico.Email != null)
+                medicoRepository.Delete(email: medico.Email);
         }
 
         [Fact]
-        public void Medico_POST_CadastrarMedico_CPFJaExiste()
+        public async void Medico_POST_CadastrarMedico_CPFJaExiste()
         {
-
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            var sendContent = medico;
+            var expectedContent = "Médico já cadastrado";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         [Fact]
-        public void Medico_POST_CadastrarMedico_CPFInvalido()
+        public async void Medico_POST_CadastrarMedico_CPFInvalido()
         {
-
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039890", "CRM/01234", "P@ssw0rd", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            var sendContent = medico;
+            var expectedContent = "CPF inválido";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         [Fact]
-        public void Medico_POST_CadastrarMedico_EmailJaExiste()
+        public async void Medico_POST_CadastrarMedico_EmailJaExiste()
         {
-
+            Medico medico = new("Elton Mattos", "joao.silva@example.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            var sendContent = medico;
+            var expectedContent = "Médico já cadastrado";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         [Fact]
-        public void Medico_POST_CadastrarMedico_SenhaInvalida()
+        public async void Medico_POST_CadastrarMedico_SenhaInvalida()
         {
-
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "CRM/01234", "1234", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            var sendContent = medico;
+            var expectedContent = @"Comprimento mínimo: A senha deve ser composta de:
+                                            - Pelo menos 8 caracteres.
+                                            - Pelo menos uma letra maiúscula.
+                                            - Pelo menos uma letra minúscula.
+                                            - Pelo menos um número.";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         [Fact]
-        public void Medico_POST_CadastrarMedico_FormatoEmailInvalido()
+        public async void Medico_POST_CadastrarMedico_FormatoEmailInvalido()
         {
-
+            Medico medico = new("Elton Mattos", "eltonmattosoutlook.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            var sendContent = medico;
+            var expectedContent = "Email inválido";
+            // Act.
+            var response = await TestHelpers._httpClient.PostAsync("/api/Medico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         public void Dispose()

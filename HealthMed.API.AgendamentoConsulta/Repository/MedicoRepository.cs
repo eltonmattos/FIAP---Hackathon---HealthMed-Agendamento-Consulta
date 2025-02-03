@@ -163,7 +163,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 string tableName = isMedico ? "Medico" : "Paciente";
 
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.{tableName} ");
-                query.Append($"WHERE [Email] = '{email}'");// AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
+                query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
 
                 string? userId = sqldb.Connection?.QueryFirstOrDefault<string?>(query.ToString());
 
@@ -210,6 +210,24 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
                 if (result != null)
                     throw new Exception("Médico já cadastrado");
+            }
+        }
+
+
+        public void Delete(String email)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[Medico] WHERE [Email] = '{email}' ");
+
+                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
+
+                sqldb.Connection.Close();
             }
         }
     }

@@ -38,11 +38,18 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         {
             Guid idPaciente = _pacienteRepository.Post(value);
             _logger.LogInformation("Paciente cadastrado com sucesso.");
-            return Ok(new
+            try
             {
-                Message = "Paciente cadastrado com sucesso.",
-                Id = idPaciente
-            });
+                return Ok(new
+                {
+                    Message = "Paciente cadastrado com sucesso.",
+                    Id = idPaciente
+                });
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }

@@ -9,33 +9,65 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
     public class Test_Paciente
     {
         [Fact]
-        public void EfetuaLoginComSucesso()
+        public async void EfetuaLoginComSucesso()
         {
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            // Act.
+            HttpResponseMessage response = await TestHelpers.RequestToken("ana.pereira%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(response);
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+            Assert.True(!String.IsNullOrEmpty(token));
         }
 
         [Fact]
-        public void EfetuaLoginComFalha()
+        public async void EfetuaLoginComFalha()
         {
+            var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
+            // Act.
+            HttpResponseMessage response = await TestHelpers.RequestToken("ana.pereira%40example.com", "Senha121%40", "api/Auth/LoginPaciente/LoginPaciente");
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
         [Fact]
-        public void ListaMedicos()
+        public async void ListaMedicos()
         {
+            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(response);
+            Assert.True(!String.IsNullOrEmpty(token));
+
+            Assert.True(false);
         }
 
         [Fact]
-        public void AgendaConsultaComSucesso()
+        public async void AgendaConsultaComSucesso()
         {
+            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente"); ;
+            String? token = await TestHelpers.GetToken(response);
+            Assert.True(!String.IsNullOrEmpty(token));
+
+            Assert.True(false);
         }
 
         [Fact]
-        public void AgendaConsulta_SemHorarioDisponivel()
+        public async void AgendaConsulta_SemHorarioDisponivel()
         {
+            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(response);
+            Assert.True(!String.IsNullOrEmpty(token));
+
+            Assert.True(false);
         }
 
         [Fact]
-        public void AgendaConsulta_ConsultaExistente()
+        public async void AgendaConsulta_ConsultaExistente()
         {
+            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(response);
+            Assert.True(!String.IsNullOrEmpty(token));
+
+            Assert.True(false);
         }
     }
 }

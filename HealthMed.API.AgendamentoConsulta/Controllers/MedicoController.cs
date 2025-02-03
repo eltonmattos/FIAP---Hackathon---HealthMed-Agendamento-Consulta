@@ -64,11 +64,18 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         {
             Guid idMedico = _medicoRepository.Post(value);
             _logger.LogInformation("Médico cadastrado com sucesso: {IdMedico}", idMedico);
-            return Ok(new
+            try
             {
-                Message = "Médico cadastrado com sucesso.",
-                Id = idMedico
-            });
+                return Ok(new
+                {
+                    Message = "Médico cadastrado com sucesso.",
+                    Id = idMedico
+                });
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         //// POST: MedicoController/Create

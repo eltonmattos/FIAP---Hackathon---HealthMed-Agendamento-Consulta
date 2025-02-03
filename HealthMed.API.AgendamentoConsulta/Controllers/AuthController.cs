@@ -50,10 +50,6 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         [HttpPost("LoginMedico")]
         public IActionResult LoginMedico(string email, string password)
         {
-            var medico = _medicoRepository.GetToken(email, password, true);
-            if (medico == null)
-                return Unauthorized(new { message = "Usuário ou senha inválida." });
-
             string? token = _medicoRepository.GetToken(email, password, true); // true = Médico
 
             if (!string.IsNullOrEmpty(token))
@@ -61,19 +57,17 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
                 _logger.LogInformation("Médico logado com sucesso.");
                 return Ok(new { token });
             }
-
-            _logger.LogError("Usuário ou senha inválida.");
-            return Unauthorized(new { message = "Usuário ou senha inválida." });
+            else
+            {
+                _logger.LogError("Usuário ou senha inválida.");
+                return Unauthorized(new { message = "Usuário ou senha inválida." });
+            }
         }
 
         
         [HttpPost("LoginPaciente")]
         public IActionResult LoginPaciente(string email, string password)
         {
-            var paciente = _medicoRepository.GetToken(email, password, false);
-            if (paciente == null)
-                return Unauthorized(new { message = "Usuário ou senha inválida." });
-
             string? token = _pacienteRepository.GetToken(email, password, false); // false = Paciente
 
             if (!string.IsNullOrEmpty(token))
@@ -81,9 +75,12 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
                 _logger.LogInformation("Paciente logado com sucesso.");
                 return Ok(new { token });
             }
+            else
+            {
+                _logger.LogError("Usuário ou senha inválida.");
+                return Unauthorized(new { message = "Usuário ou senha inválida." });
+            }
 
-            _logger.LogError("Usuário ou senha inválida.");
-            return Unauthorized(new { message = "Usuário ou senha inválida." });
         }
 
     }
