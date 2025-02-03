@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthMed.API.AgendamentoConsulta.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,13 +32,31 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         }
 
         [Fact]
+        public async void ListaMedicos_NaoAutorizado()
+        {
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha113%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(tokenResponse);
+
+            var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
+            // Act.
+            TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await TestHelpers._httpClient.GetAsync("/api/Medico/");
+            string message = await response.Content.ReadAsStringAsync();
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+        }
+
+        [Fact]
         public async void ListaMedicos()
         {
-            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
-            String? token = await TestHelpers.GetToken(response);
-            Assert.True(!String.IsNullOrEmpty(token));
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginPaciente/LoginPaciente");
+            String? token = await TestHelpers.GetToken(tokenResponse);
 
-            Assert.True(false);
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            // Act.
+            TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await TestHelpers._httpClient.GetAsync("/api/Medico/");
+            string message = await response.Content.ReadAsStringAsync();
+            Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
         [Fact]

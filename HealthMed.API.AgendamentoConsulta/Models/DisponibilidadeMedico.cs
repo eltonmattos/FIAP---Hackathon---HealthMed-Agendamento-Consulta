@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace HealthMed.API.AgendamentoConsulta.Models
@@ -12,6 +13,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public required TimeSpan FimPeriodo { get; set; }
         public required DateTime Validade { get; set; }
 
+        [SetsRequiredMembers]
         public DisponibilidadeMedico(Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {
             this.Id = Guid.NewGuid();

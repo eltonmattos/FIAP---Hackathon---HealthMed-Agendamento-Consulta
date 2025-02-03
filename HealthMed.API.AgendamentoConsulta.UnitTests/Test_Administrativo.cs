@@ -15,7 +15,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void Paciente_POST_PacienteCadastradoComSucesso()
         {
             Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "P@ssw0rd");
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var expectedStatusCode = System.Net.HttpStatusCode.OK; 
             var sendContent = paciente;
             var expectedContent = "Paciente cadastrado com sucesso.";
             // Act.
@@ -115,7 +115,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void Medico_POST_MedicoCadastradoComSucesso()
         {
             Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039892", "CRM/01234", "P@ssw0rd", 30);
-            var expectedStatusCode = System.Net.HttpStatusCode.OK; //Created (201)
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
             var sendContent = medico;
             var expectedContent = "Médico cadastrado com sucesso.";
             // Act.
