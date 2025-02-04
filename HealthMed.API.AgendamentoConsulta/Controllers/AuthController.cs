@@ -48,9 +48,9 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         }
 
         [HttpPost("LoginMedico")]
-        public IActionResult LoginMedico(string email, string password)
+        public IActionResult LoginMedico(string crm, string password)
         {
-            string? token = _medicoRepository.GetToken(email, password, true); // true = Médico
+            string? token = _medicoRepository.GetToken(crm, password, true); // true = Médico
 
             if (!string.IsNullOrEmpty(token))
             {

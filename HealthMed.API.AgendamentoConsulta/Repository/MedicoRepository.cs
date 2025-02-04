@@ -5,6 +5,7 @@ using Dapper;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace HealthMed.API.AgendamentoConsulta.Repository
 {
@@ -85,7 +86,6 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-
         public Medico? Get(String idMedico)
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
@@ -145,9 +145,9 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public string? GetToken(string email, string senha, bool isMedico)
+        public string? GetToken(string crm, string senha, bool isMedico)
         {
-            UsuarioRepository.ValidateEmail(email);
+            new MedicoRepository(_config).ValidateCRM(crm);
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -163,7 +163,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 string tableName = isMedico ? "Medico" : "Paciente";
 
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.{tableName} ");
-                query.Append($"WHERE [Email] = '{email}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
+                query.Append($"WHERE [CRM] = '{crm}' AND [Senha] = HASHBYTES('SHA2_256', '{senha}')");
 
                 string? userId = sqldb.Connection?.QueryFirstOrDefault<string?>(query.ToString());
 
@@ -173,7 +173,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     string role = isMedico ? "Medico" : "Paciente";
 
                     var jwtService = new JwtService(_config);
-                    return jwtService.GenerateToken(email, role);
+                    return jwtService.GenerateToken(crm, role);
                 }
 
                 return null;
@@ -213,6 +213,12 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
+        public void ValidateCRM(String crm)
+        {
+            string padrao = @"^\d{6}(-P)?-[A-Z]{2}$";
+            if (!Regex.IsMatch(crm, padrao))
+                throw new FormatException("CRM inválido");
+        }
 
         public void Delete(String email)
         {

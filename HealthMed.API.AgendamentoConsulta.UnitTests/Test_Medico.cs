@@ -19,7 +19,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
             // Act.
-            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage response = await TestHelpers.RequestToken("123456-SP", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
             String? token = await TestHelpers.GetToken(response);
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
@@ -31,7 +31,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
             // Act.
-            HttpResponseMessage response = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha124%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage response = await TestHelpers.RequestToken("123456-SP", "Senha124%40", "api/Auth/LoginMedico/LoginMedico");
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
         }
@@ -63,7 +63,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void CriaDisponibilidadeAgendamento_DisponibilidadeCriadaComSucesso()
         {
             String? token = String.Empty;
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("123456-SP", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new Guid("550e8400-e29b-41d4-a716-446655440000");
@@ -93,7 +93,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void CriaDisponibilidadeAgendamento_IntervaloHorarioInvalido()
         {
             String? token = String.Empty;
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("123456-SP", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new Guid("550e8400-e29b-41d4-a716-446655440000");
@@ -118,7 +118,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void CriaDisponibilidadeAgendamento_DataValidadePassada()
         {
             String? token = String.Empty;
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("123456-SP", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new Guid("550e8400-e29b-41d4-a716-446655440000");
@@ -144,7 +144,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             String? token = String.Empty;
             Guid idDisponibilidadeMedico = new Guid("770e8400-e29b-41d4-a716-446655440009");
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("joao.silva%40example.com", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken("123456-SP", "Senha123%40", "api/Auth/LoginMedico/LoginMedico");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new Guid("550e8400-e29b-41d4-a716-446655440000");
