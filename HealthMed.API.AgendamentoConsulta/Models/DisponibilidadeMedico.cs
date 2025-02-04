@@ -12,6 +12,8 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public required TimeSpan FimPeriodo { get; set; }
         public required DateTime Validade { get; set; }
 
+        public DisponibilidadeMedico() { }
+
         [SetsRequiredMembers]
         public DisponibilidadeMedico(Guid Medico, int DiaSemana, TimeSpan InicioPeriodo, TimeSpan FimPeriodo, DateTime Validade)
         {

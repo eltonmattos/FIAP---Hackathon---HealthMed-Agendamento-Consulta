@@ -87,22 +87,28 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             using (sqldb.Connection)
             {
-                Guid idDisponibilidadeMedico = Guid.NewGuid();
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
                 query.Append($@"SELECT [Id]
-                                  ,[DiaSemana]
-                                  ,[InicioPeriodo]
-                                  ,[FimPeriodo]
-                                  ,[Validade]
-                                  ,[IdMedico]
-                              FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico]");
-                query.Append($"WHERE IdMedico = '{idMedico}'");
+              ,[DiaSemana]
+              ,[InicioPeriodo]
+              ,[FimPeriodo]
+              ,[Validade]
+              ,[IdMedico]
+          FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico]");
+                query.Append(" WHERE IdMedico = @IdMedico");
 
-                IEnumerable<DisponibilidadeMedico> result = sqldb.Connection.Query<DisponibilidadeMedico>(
-                    query.ToString(), param: null);
+                var result = sqldb.Connection.Query(query.ToString(), new { IdMedico = idMedico.ToString() })
+                    .Select(r => new DisponibilidadeMedico
+                    {
+                        Id = Guid.Parse(r.Id),
+                        DiaSemana = r.DiaSemana,
+                        InicioPeriodo = r.InicioPeriodo,
+                        FimPeriodo = r.FimPeriodo,
+                        Validade = r.Validade,
+                        IdMedico = Guid.Parse(r.IdMedico)
+                    }).ToList();
 
-                sqldb.Connection.Close();
                 return result;
             }
         }
