@@ -20,7 +20,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             UsuarioRepository.ValidateEmail(medico.Email);
             UsuarioRepository.ValidateCPF(medico.CPF);
             UsuarioRepository.ValidatePassword(medico.Senha);
-            ValidateMedicoExiste(medico.Email, medico.CPF);
+            ValidateMedicoExiste(medico.Email, medico.CPF, medico.CRM);
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -54,7 +54,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public IEnumerable<object> Get()
+        public IEnumerable<object> GetMedicos(String? especialidade)
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
             if (sqldb == null || sqldb.Connection == null)
@@ -63,26 +63,27 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             using (sqldb.Connection)
             {
                 var query = new StringBuilder();
-                query.Append(@$"SELECT [Id] ,[Nome] FROM [HealthMedAgendamento].[dbo].[Medico] ");
+                query.Append(@$"SELECT 
+                                    m.Id AS IdMedico,
+                                    m.Nome AS NomeMedico,
+                                    e.Id AS IdEspecialidade,
+                                    e.Nome AS NomeEspecialidade,
+                                    m.ValorConsulta AS ValorConsulta
+                                FROM 
+                                    dbo.Medico m
+                                JOIN 
+                                    dbo.rel_Especialidades_Medico re ON m.Id = re.IdMedico
+                                JOIN 
+                                    dbo.Especialidades e ON re.IdEspecialidade = e.Id ");
+                if (especialidade != null)
+                    query.Append($"WHERE e.Nome LIKE '%{especialidade}%'");
 
-                IEnumerable<Medico> result = sqldb.Connection.Query<Medico>(
+                IEnumerable<object> result = sqldb.Connection.Query<object>(
                     query.ToString(), param: null);
 
                 sqldb.Connection.Close();
 
-                List<object> getMedicos = [];
-
-                foreach (var medico in result)
-                {
-                    object getMedico = new
-                    {
-                        Id = medico.GetId(),
-                        medico.Nome
-                    };
-                    getMedicos.Add(getMedico);
-                }
-
-                return getMedicos.AsEnumerable();
+                return result;
             }
         }
 
@@ -95,7 +96,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             using (sqldb.Connection)
             {
                 var query = new StringBuilder();
-                query.Append(@$"SELECT [Nome],[CPF],[CRM],[Email],[DuracaoConsulta]
+                query.Append(@$"SELECT [Nome],[CPF],[CRM],[Email],[DuracaoConsulta], [ValorConsulta]
                               FROM [HealthMedAgendamento].[dbo].[Medico] WHERE [Id] = '{idMedico}' ");
 
                 IEnumerable<Medico> result = sqldb.Connection.Query<Medico>(query.ToString(), param: null);
@@ -111,7 +112,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             UsuarioRepository.ValidateEmail(medico.Email);
             UsuarioRepository.ValidateCPF(medico.CPF);
             UsuarioRepository.ValidatePassword(medico.Senha);
-            ValidateMedicoExiste(medico.Email, medico.CPF);
+            ValidateMedicoExiste(medico.Email, medico.CPF, medico.CRM);
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -189,7 +190,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         /// <param name="cpf"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public void ValidateMedicoExiste(String email, String cpf)
+        public void ValidateMedicoExiste(String email, String cpf, String crm)
         {
             cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -204,7 +205,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
                 query.Append($"SELECT [Id] FROM {dbname}.dbo.Medico ");
-                query.Append($"WHERE [Email] = '{email}' OR [CPF] = '{cpf}'");
+                query.Append($"WHERE [Email] = '{email}' OR [CPF] = '{cpf}'  OR [CRM] = '{crm}'");
 
                 String? result = sqldb.Connection?.QueryFirstOrDefault<String>(query.ToString());
 
@@ -230,9 +231,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             {
                 var query = new StringBuilder();
                 query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[Medico] WHERE [Email] = '{email}' ");
-
-                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
-
+                sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
                 sqldb.Connection.Close();
             }
         }

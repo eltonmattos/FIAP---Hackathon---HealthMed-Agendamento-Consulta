@@ -3,6 +3,7 @@ using HealthMed.API.AgendamentoConsulta.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
@@ -27,6 +28,11 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         {
             Guid idAgendamento = _agendamentoRepository.Post(value);
             _logger.LogInformation("Agendamento cadastrado com sucesso.");
+
+#if (!DEBUG)
+            _agendamentoRepository.NotificarAgendamento(idAgendamento);
+#endif
+
             return Ok(new
             {
                 Message = "Agendamento cadastrado com sucesso.",
@@ -61,6 +67,82 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
             DateTime dateFormat = DateTime.Parse(Data);
             IEnumerable<Agendamento> agendamentos = _agendamentoRepository.Get(idMedico, dateFormat);
             return Ok(agendamentos);
+        }
+
+
+        // PUT: api/<AgendamentoController>
+        /// <summary>
+        /// Aprovar Agendamento
+        /// </summary>
+        /// <param name="idAgendamento"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Medico")]
+
+        [HttpPut("/api/Agendamento/AprovarAgendamento/{idAgendamento}")]
+        public IActionResult AprovarAgendamento(String idAgendamento)
+        {
+            _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.Aprovado);
+#if (!DEBUG)
+            _agendamentoRepository.NotificarAprovacao(new Guid(idAgendamento));
+#endif
+            _logger.LogInformation("Agendamento aprovado com sucesso.");
+
+            return Ok(new
+            {
+                Message = "Agendamento aprovado com sucesso.",
+                Id = idAgendamento
+            });
+        }
+
+        // PUT: api/<AgendamentoController>
+        /// <summary>
+        /// Recusar Agendamento
+        /// </summary>
+        /// <param name="idAgendamento"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Medico")]
+
+        [HttpPut("/api/Agendamento/RecusarAgendamento/{idAgendamento}")]
+        public IActionResult RecusarAgendamento(String idAgendamento)
+        {
+            _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.RecusadoPeloMedico);
+
+#if (!DEBUG)
+            _agendamentoRepository.NotificarRecusa(new Guid(idAgendamento));
+#endif
+            _logger.LogInformation("Agendamento recusado.");
+
+            return Ok(new
+            {
+                Message = "Agendamento recusado.",
+                Id = idAgendamento
+            });
+        }
+
+        // PUT: api/<AgendamentoController>
+        /// <summary>
+        /// Cancelar Agendamento
+        /// </summary>
+        /// <param name="idAgendamento"></param>
+        /// <param name="Motivo"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Paciente")]
+
+        [HttpPut("/api/Agendamento/CancelarAgendamento/{idAgendamento}")]
+        public IActionResult CancelarAgendamento(String idAgendamento, [BindRequired] String Motivo)
+        {
+            _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.RecusadoPeloMedico, Motivo);
+
+#if (!DEBUG)
+            _agendamentoRepository.NotificarCancelamento(new Guid(idAgendamento), Motivo);
+#endif
+            _logger.LogInformation("Agendamento cancelado.");
+
+            return Ok(new
+            {
+                Message = "Agendamento recusado.",
+                Id = idAgendamento
+            });
         }
     }
 }

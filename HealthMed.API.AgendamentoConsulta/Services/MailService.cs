@@ -16,32 +16,31 @@ namespace HealthMed.API.AgendamentoConsulta.Services
         public async Task SendEmailAsync(MailRequest mailRequest)
         {
             // Copy the connection String Endpoint here
-            var client = new EmailClient(_config.GetValue<String>("MailService.ConnectionString"));
+            var client = new EmailClient(_config.GetValue<String>("MailService:ConnectionString"));
 
             // Fill the EmailMessage
 
             // Add the Mailfrom Address 
-            var sender = _config.GetValue<String>("MailService.MailFromAddress");
+            var sender = _config.GetValue<String>("MailService:MailFromAddress");
             var subject = mailRequest.Subject;
+            
 
             var emailContent = new EmailContent(subject)
             {
                 PlainText = mailRequest.Body
             };
 
-            var toRecipients = new List<EmailAddress>()
-            {
-                new(mailRequest.ToEmail)
-            };
+            List<EmailAddress> toRecipients = new List<EmailAddress>();
+            toRecipients.Add(new(mailRequest.To));
+            if (mailRequest.Cc != null)
+                toRecipients.Add(new(mailRequest.Cc));
 
             var emailRecipients = new EmailRecipients(toRecipients);
 
             var emailMessage = new EmailMessage(sender, emailRecipients, emailContent);
 
-            //await client.SendAsync(emailMessage);
-
-            await client.SendAsync(WaitUntil.Completed, emailMessage);
-            Console.WriteLine($"Email Sent. Status = {emailMessage}");
+            await client.SendAsync(WaitUntil.Started, emailMessage);
+            //await client.SendAsync(WaitUntil.Completed, emailMessage);
         }
     }
 }

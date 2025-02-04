@@ -35,10 +35,10 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
                 .Build();
         }
 
-        public static async Task<HttpResponseMessage> RequestToken(string email, string password, string uri)
+        public static async Task<HttpResponseMessage> RequestToken(string uri)
         {
 
-            var response = await TestHelpers._httpClient.PostAsync(@$"{uri}?email={email}&password={password}", null);
+            var response = await TestHelpers._httpClient.PostAsync(uri, null);
             return response;
         }
 

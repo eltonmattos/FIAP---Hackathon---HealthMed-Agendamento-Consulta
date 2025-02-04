@@ -8,7 +8,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Paciente : Usuario
     {
-        public string CPF { get; set; }
+        public required string CPF { get; set; }
 
         [SetsRequiredMembers]
         public Paciente(String Nome, String CPF, String Email)
@@ -19,6 +19,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.Email = Email;
         }
 
+        [SetsRequiredMembers]
         [JsonConstructor]
         public Paciente(string nome, string email, string CPF, string senha)
         {

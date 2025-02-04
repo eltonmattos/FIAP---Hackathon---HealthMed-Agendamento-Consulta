@@ -20,10 +20,10 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize(Roles = "Paciente")]
-        [HttpGet("/api/Medico/")]
-        public IActionResult Get()
+        [HttpGet("/api/Medico")]
+        public IActionResult GetMedicos([FromQuery]String? especialidade)
         {
-            IEnumerable<object> medicos = _medicoRepository.Get();
+            IEnumerable<object> medicos = _medicoRepository.GetMedicos(especialidade);
             return Ok(medicos);
         }
 

@@ -9,9 +9,10 @@ namespace HealthMed.API.AgendamentoConsulta.Models
 {
     public class Medico : Usuario
     {
-        public string? CPF { get; set; }
-        public string? CRM { get; set; }
-        public int? DuracaoConsulta { get; set; }
+        public required string? CPF { get; set; }
+        public required string? CRM { get; set; }
+        public required int? DuracaoConsulta { get; set; }
+        public required double ValorConsulta { get; set; }
 
         public Medico(String id, String nome)
         {
@@ -20,7 +21,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         }
 
         [SetsRequiredMembers]
-        public Medico(String Nome, String CPF, String CRM, String Email, Int32 DuracaoConsulta)
+        public Medico(String Nome, String CPF, String CRM, String Email, Int32 DuracaoConsulta, Decimal valorConsulta)
         {
             SetId(Guid.NewGuid());
             this.Nome = Nome;
@@ -28,10 +29,12 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.CRM = CRM;
             this.Email = Email;
             this.DuracaoConsulta = DuracaoConsulta;
+            this.ValorConsulta = (Double)valorConsulta;
         }
 
+        [SetsRequiredMembers]
         [JsonConstructor]
-        public Medico(string nome, string email, string CPF, string CRM, string senha, int? duracaoConsulta)
+        public Medico(string nome, string email, string CPF, string CRM, string senha, int? duracaoConsulta, Decimal valorConsulta)
         {
             SetId(Guid.NewGuid());
             this.Nome = nome;
@@ -40,6 +43,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.CRM = CRM;
             this.CPF = CPF;
             this.DuracaoConsulta = duracaoConsulta;
+            this.ValorConsulta = (Double)valorConsulta;
         }
     }
 }

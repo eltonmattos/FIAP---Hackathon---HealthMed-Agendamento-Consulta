@@ -114,7 +114,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_MedicoCadastradoComSucesso()
         {
-            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039892", "CRM/01234", "P@ssw0rd", 30);
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039892", "012345-SP", "P@ssw0rd", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
             var sendContent = medico;
             var expectedContent = "Médico cadastrado com sucesso.";
@@ -133,7 +133,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_CadastrarMedico_CPFJaExiste()
         {
-            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "012345-SP", "P@ssw0rd", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = medico;
             var expectedContent = "Médico já cadastrado";
@@ -148,7 +148,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_CadastrarMedico_CPFInvalido()
         {
-            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039890", "CRM/01234", "P@ssw0rd", 30);
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "35664039890", "012345-SP", "P@ssw0rd", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = medico;
             var expectedContent = "CPF inválido";
@@ -163,7 +163,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_CadastrarMedico_EmailJaExiste()
         {
-            Medico medico = new("Elton Mattos", "joao.silva@example.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            Medico medico = new("Elton Mattos", "joao.silva@example.com", "52998224725", "012345-SP", "P@ssw0rd", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = medico;
             var expectedContent = "Médico já cadastrado";
@@ -178,7 +178,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_CadastrarMedico_SenhaInvalida()
         {
-            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "CRM/01234", "1234", 30);
+            Medico medico = new("Elton Mattos", "elton.mattos@outlook.com", "52998224725", "012345-SP", "1234", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = medico;
             var expectedContent = @"Comprimento mínimo: A senha deve ser composta de:
@@ -197,7 +197,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void Medico_POST_CadastrarMedico_FormatoEmailInvalido()
         {
-            Medico medico = new("Elton Mattos", "eltonmattosoutlook.com", "52998224725", "CRM/01234", "P@ssw0rd", 30);
+            Medico medico = new("Elton Mattos", "eltonmattosoutlook.com", "52998224725", "012345-SP", "P@ssw0rd", 30, 100.00M);
             var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = medico;
             var expectedContent = "Email inválido";

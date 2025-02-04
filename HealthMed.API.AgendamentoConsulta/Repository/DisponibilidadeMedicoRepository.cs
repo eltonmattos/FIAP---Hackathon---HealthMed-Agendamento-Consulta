@@ -90,18 +90,18 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 var query = new StringBuilder();
                 dbname = this._config.GetValue<string>("DatabaseName");
                 query.Append($@"SELECT [Id]
-              ,[DiaSemana]
-              ,[InicioPeriodo]
-              ,[FimPeriodo]
-              ,[Validade]
-              ,[IdMedico]
-          FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico]");
+                  ,[DiaSemana]
+                  ,[InicioPeriodo]
+                  ,[FimPeriodo]
+                  ,[Validade]
+                  ,[IdMedico]
+                FROM [{dbname}].[dbo].[DisponibilidadeMedico]");
                 query.Append(" WHERE IdMedico = @IdMedico");
 
                 var result = sqldb.Connection.Query(query.ToString(), new { IdMedico = idMedico.ToString() })
                     .Select(r => new DisponibilidadeMedico
                     {
-                        Id = Guid.Parse(r.Id),
+                        //Id = Guid.Parse(r.Id),
                         DiaSemana = r.DiaSemana,
                         InicioPeriodo = r.InicioPeriodo,
                         FimPeriodo = r.FimPeriodo,
@@ -152,9 +152,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             {
                 var query = new StringBuilder();
                 query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico] WHERE [id] = '{idDisponibilidade.ToString()}' ");
-
-                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
-
+                sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
                 sqldb.Connection.Close();
             }
         }
