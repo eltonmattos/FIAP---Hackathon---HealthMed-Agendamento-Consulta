@@ -47,4 +47,5 @@ Corpo do e-mail:
 
 ## Estrutura de Dados
 
-![image](https://github.com/user-attachments/assets/e50eae1a-7205-43ba-a8d5-c4881b2d76d7)
+![image](https://github.com/user-attachments/assets/473f9cb3-b879-4ce4-ac11-5d41afba7a07)
+
