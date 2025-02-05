@@ -60,6 +60,20 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         }
 
         [Fact]
+        public async void ListaMedicos_FiltroPorEspecialidade()
+        {
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            String? token = await TestHelpers.GetToken(tokenResponse);
+
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            // Act.
+            TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await TestHelpers._httpClient.GetAsync("/api/Medico/?especialidade=cardio");
+            //string message = await response.Content.ReadAsStringAsync();
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+        }
+
+        [Fact]
         public async void AgendaConsultaComSucesso_EmailDisparado()
         {
             String? token = String.Empty;

@@ -65,9 +65,12 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            DisponibilidadeMedico disponibilidade = new(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 2, 10));
+            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)));
+
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
-            var sendContent = disponibilidade;
+            var sendContent = disponibilidades;
             var expectedContent = "Período de Disponibilidade cadastrado com sucesso.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);

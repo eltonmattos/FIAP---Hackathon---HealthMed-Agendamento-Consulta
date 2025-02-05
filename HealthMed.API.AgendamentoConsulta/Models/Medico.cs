@@ -12,7 +12,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         public required string? CPF { get; set; }
         public required string? CRM { get; set; }
         public required int? DuracaoConsulta { get; set; }
-        public required double ValorConsulta { get; set; }
+        public required decimal ValorConsulta { get; set; }
 
         public Medico(String id, String nome)
         {
@@ -21,15 +21,16 @@ namespace HealthMed.API.AgendamentoConsulta.Models
         }
 
         [SetsRequiredMembers]
-        public Medico(String Nome, String CPF, String CRM, String Email, Int32 DuracaoConsulta, Decimal valorConsulta)
+        public Medico(String Nome, String Email, String CPF, String CRM, Int32 DuracaoConsulta, Decimal valorConsulta)
         {
             SetId(Guid.NewGuid());
             this.Nome = Nome;
             this.CPF = CPF;
             this.CRM = CRM;
+            this.Senha = Senha;
             this.Email = Email;
             this.DuracaoConsulta = DuracaoConsulta;
-            this.ValorConsulta = (Double)valorConsulta;
+            this.ValorConsulta = valorConsulta;
         }
 
         [SetsRequiredMembers]
@@ -43,7 +44,7 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.CRM = CRM;
             this.CPF = CPF;
             this.DuracaoConsulta = duracaoConsulta;
-            this.ValorConsulta = (Double)valorConsulta;
+            this.ValorConsulta = valorConsulta;
         }
     }
 }

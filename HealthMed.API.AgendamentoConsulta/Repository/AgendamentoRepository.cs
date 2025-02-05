@@ -357,7 +357,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         {
             AgendamentoRepository agendamentoRepository = new(this._config);
             Agendamento? agendamento = agendamentoRepository.GetAgendamento(idAgendamento.ToString());
-            
+
             PacienteRepository pacienteRepository = new(this._config);
             Paciente? paciente = pacienteRepository.Get(agendamento.IdPaciente.ToString());
 
@@ -380,5 +380,6 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 MailService mailService = new(this._config);
                 await mailService.SendEmailAsync(mail);
             }
+        }
     }
 }

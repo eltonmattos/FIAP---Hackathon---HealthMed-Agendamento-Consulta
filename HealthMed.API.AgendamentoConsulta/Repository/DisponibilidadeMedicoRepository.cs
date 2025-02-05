@@ -3,6 +3,7 @@ using HealthMed.API.AgendamentoConsulta.Services;
 using HealthMed.API.AgendamentoConsulta.Models;
 using Microsoft.Data.SqlClient;
 using System.Text;
+using Microsoft.Identity.Client;
 
 namespace HealthMed.API.AgendamentoConsulta.Repository
 {
@@ -12,10 +13,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         String? dbname = String.Empty;
         public readonly IConfiguration _config = configuration;
 
-        public Guid Post(DisponibilidadeMedico disponibilidadeMedico)
+        public IEnumerable<Guid> Post(IEnumerable<DisponibilidadeMedico> disponibilidadesMedico)
         {
-            ValidadeDataValidade(disponibilidadeMedico.Validade);
-            ValidadeHorario(disponibilidadeMedico.InicioPeriodo, disponibilidadeMedico.FimPeriodo);
+            if (disponibilidadesMedico == null || disponibilidadesMedico.Count() == 0)
+                return new List<Guid>();
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -24,29 +25,43 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             using (sqldb.Connection)
             {
+                List<Guid> ids = new List<Guid>();
+
                 Guid idDisponibilidadeMedico = Guid.NewGuid();
+
                 dbname = this._config.GetValue<string>("DatabaseName");
 
-                string query = $@"
-                                    INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
-                                        ([Id], [DiaSemana], [InicioPeriodo], [FimPeriodo], [Validade], [IdMedico]) 
-                                    VALUES 
-                                        (@Id, @DiaSemana, @InicioPeriodo, @FimPeriodo, @Validade, @IdMedico)";
+                StringBuilder query = new StringBuilder();
+                query.Append($@"INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
+                                ([Id], [DiaSemana], [InicioPeriodo], [FimPeriodo], [Validade], [IdMedico]) VALUES ");
+
+                foreach (var d in disponibilidadesMedico)
+                {
+                    try
+                    {
+                        ValidadeDataValidade(d.Validade);
+                        ValidadeHorario(d.InicioPeriodo, d.FimPeriodo);
+                        query.Append($@"VALUES 
+                                        ('{Guid.NewGuid()}', {d.DiaSemana}, '{d.InicioPeriodo}', '{d.FimPeriodo}', '{d.Validade}', '{d.IdMedico}')");
+                        if (d != disponibilidadesMedico.Last())
+                            query.Append(", ");
+                        ids.Add(idDisponibilidadeMedico);
+
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(e.Message);
+                    }
+                }
 
                 sqldb.Connection.Open();
-                SqlCommand command = new(query, sqldb.Connection);
-
-                command.Parameters.AddWithValue("@Id", idDisponibilidadeMedico);
-                command.Parameters.AddWithValue("@DiaSemana", disponibilidadeMedico.DiaSemana);
-                command.Parameters.AddWithValue("@InicioPeriodo", disponibilidadeMedico.InicioPeriodo);
-                command.Parameters.AddWithValue("@FimPeriodo", disponibilidadeMedico.FimPeriodo);
-                command.Parameters.AddWithValue("@Validade", disponibilidadeMedico.Validade.ToString("yyyy-MM-dd HH:mm:ss"));
-                command.Parameters.AddWithValue("@IdMedico", disponibilidadeMedico.IdMedico);
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
 
                 command.ExecuteNonQuery();
                 sqldb.Connection.Close();
-                return idDisponibilidadeMedico;
+                return ids;
             }
+           
         }
         public void Put(String idMedico, String idDisponibilidadeMedico, DisponibilidadeMedico disponibilidadeMedico)
         {

@@ -35,15 +35,16 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Medico")]
         [HttpPost("/api/DisponibilidadeMedico/")]
-        public IActionResult Post([FromBody] DisponibilidadeMedico value)
+        public IActionResult Post([FromBody] IEnumerable<DisponibilidadeMedico> value)
         {
-            Guid idDisponibilidadeMedico = _disponibilidadeMedicoRepository.Post(value);
+            IEnumerable<Guid> idsDisponibilidadeMedico = _disponibilidadeMedicoRepository.Post(value);
             _logger.LogInformation("Período de Disponibilidade cadastrado com sucesso.");
-            return Ok(new
-            {
-                Message = "Período de Disponibilidade cadastrado com sucesso.",
-                Id = idDisponibilidadeMedico
-            });
+            return Ok(
+                new
+                {
+                    Message = "Período de Disponibilidade cadastrado com sucesso.",
+                }
+            );
         }
 
         // PUT: DisponibilidadeMedicoController
