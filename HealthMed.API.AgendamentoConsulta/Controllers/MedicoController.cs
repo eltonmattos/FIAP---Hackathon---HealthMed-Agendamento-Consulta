@@ -21,9 +21,9 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Paciente")]
         [HttpGet("/api/Medico")]
-        public IActionResult GetMedicos([FromQuery]String? especialidade)
+        public IActionResult GetMedicos([FromQuery]String? especialidade, [FromQuery] String? estado, [FromQuery] String? crm)
         {
-            IEnumerable<object> medicos = _medicoRepository.GetMedicos(especialidade);
+            IEnumerable<object> medicos = _medicoRepository.GetMedicos(especialidade, estado, crm);
             return Ok(medicos);
         }
 

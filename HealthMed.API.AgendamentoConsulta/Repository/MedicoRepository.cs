@@ -54,7 +54,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public IEnumerable<object> GetMedicos(String? especialidade)
+        public IEnumerable<object> GetMedicos(String? especialidade, String? estado, String? crm)
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
             if (sqldb == null || sqldb.Connection == null)
@@ -62,10 +62,12 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             using (sqldb.Connection)
             {
+                bool whereUsed = false;
                 var query = new StringBuilder();
                 query.Append(@$"SELECT 
                                     m.Id AS IdMedico,
                                     m.Nome AS NomeMedico,
+                                    m.CRM AS CRMMedico,
                                     e.Id AS IdEspecialidade,
                                     e.Nome AS NomeEspecialidade,
                                     m.ValorConsulta AS ValorConsulta
@@ -75,8 +77,35 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                                     dbo.rel_Especialidades_Medico re ON m.Id = re.IdMedico
                                 JOIN 
                                     dbo.Especialidades e ON re.IdEspecialidade = e.Id ");
+
                 if (especialidade != null)
-                    query.Append($"WHERE e.Nome LIKE '%{especialidade}%'");
+                {
+                    query.Append("WHERE "); whereUsed = true;
+                    query.Append($"e.Nome LIKE '%{especialidade}%' ");
+                }
+                if (estado != null)
+                {
+                    if (!whereUsed) {
+                        query.Append("WHERE "); whereUsed = true;
+                    }
+                    else
+                    {
+                        query.Append("AND "); 
+                    }
+                    query.Append($" m.CRM LIKE '%{estado}%' ");
+                }
+                if (crm != null)
+                {
+                    if (!whereUsed)
+                    {
+                        query.Append("WHERE "); whereUsed = true;
+                    }
+                    else
+                    {
+                        query.Append("AND ");
+                    }
+                    query.Append($"m.CRM = '{crm}' ");
+                }
 
                 IEnumerable<object> result = sqldb.Connection.Query<object>(
                     query.ToString(), param: null);

@@ -22,7 +22,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         }
     }
 
-    [Route("api/[controller]/[action]")]
+    [Route("auth/[action]")]
     [ApiController]
     public class AuthController(ILogger<PacienteController> logger,
         PacienteRepository pacienteRepository,

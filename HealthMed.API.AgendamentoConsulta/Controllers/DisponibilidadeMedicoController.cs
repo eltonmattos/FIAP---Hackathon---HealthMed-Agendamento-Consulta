@@ -3,6 +3,7 @@ using HealthMed.API.AgendamentoConsulta.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
@@ -38,6 +39,22 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         public IActionResult Post([FromBody] IEnumerable<DisponibilidadeMedico> value)
         {
             IEnumerable<object> idsDisponibilidadeMedico = _disponibilidadeMedicoRepository.Post(value);
+            return Ok(idsDisponibilidadeMedico);
+        }
+
+
+        // POST: DisponibilidadeMedicoController
+        /// <summary>
+        /// Cadastrar Horários de Disponibilidade do Médico
+        /// </summary>
+        /// <param name="prompt"></param>
+        /// <param name="idMedico"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Medico")]
+        [HttpPost("/api/DisponibilidadeMedico/{idMedico}")]
+        public IActionResult Post(String idMedico, [FromBody][BindRequired] String prompt)
+        {
+            String idsDisponibilidadeMedico = _disponibilidadeMedicoRepository.AIPost(prompt, idMedico);
             return Ok(idsDisponibilidadeMedico);
         }
 

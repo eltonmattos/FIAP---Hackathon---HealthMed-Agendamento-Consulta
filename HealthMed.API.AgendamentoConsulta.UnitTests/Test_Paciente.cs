@@ -17,7 +17,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
             // Act.
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha121%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha121%40");
             // Assert.
             Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
         }
@@ -27,7 +27,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
             // Act.
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
             // Assert.
             Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
@@ -43,7 +43,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void ListaMedicos_NaoAutorizado()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha1223%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha1223%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
@@ -55,7 +55,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void ListaMedicos()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
@@ -69,7 +69,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void ListaMedicos_FiltroPorEspecialidade()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
@@ -84,7 +84,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void AgendaConsultaComSucesso_EmailDisparado()
         {
             String? token = String.Empty;
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440002");
@@ -116,7 +116,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             String? token = String.Empty;
             Guid idAgendamento = new("74de47aa-8af9-4770-a2e7-072b019503ff");
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             token = await TestHelpers.GetToken(tokenResponse);
 
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
@@ -136,7 +136,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void AgendaConsulta_NaoAutorizado()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440002");
@@ -157,7 +157,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void AgendaConsulta_SemHorarioDisponivel()
         {
             String? token = String.Empty;
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440002");
@@ -180,7 +180,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         [Fact]
         public async void AgendaConsulta_ConsultaExistente()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440002");
