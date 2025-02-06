@@ -11,6 +11,17 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace HealthMed.API.AgendamentoConsulta.Controllers
 {
+    [Route("")]
+    [ApiController]
+    public class HomeController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("API is running!");
+        }
+    }
+
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AuthController(ILogger<PacienteController> logger,
@@ -21,31 +32,6 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         private readonly ILogger<PacienteController> _logger = logger;
         private readonly PacienteRepository _pacienteRepository = pacienteRepository;
         private readonly MedicoRepository _medicoRepository = medicoRepository;
-
-        [HttpGet]
-        [Authorize]
-        public IActionResult PrivateAPI()
-        {
-            var list = new[]
-            {
-                new { Code = 1, Name = "This end point is restricted " },
-                new { Code = 2, Name = "You need to login to see this" }
-            }.ToList();
-
-            return Ok(list);
-        }
-
-        [HttpGet]
-        public IActionResult PublicAPI()
-        {
-            var list = new[]
-            {
-                new { Code = 1, Name = "This end point can be accessed by Public" },
-                new { Code = 2, Name = "Whatever" }
-            }.ToList();
-
-            return Ok(list);
-        }
 
         [HttpPost("LoginMedico")]
         public IActionResult LoginMedico(string crm, string password)
