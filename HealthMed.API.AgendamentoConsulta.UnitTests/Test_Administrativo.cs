@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
     public class Test_Administrativo: IDisposable

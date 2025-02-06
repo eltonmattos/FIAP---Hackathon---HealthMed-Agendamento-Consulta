@@ -13,10 +13,45 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         String? dbname = String.Empty;
         public readonly IConfiguration _config = configuration;
 
-        public IEnumerable<Guid> Post(IEnumerable<DisponibilidadeMedico> disponibilidadesMedico)
+        public IEnumerable<object> Post(IEnumerable<DisponibilidadeMedico> disponibilidadesMedico)
         {
-            if (disponibilidadesMedico == null || disponibilidadesMedico.Count() == 0)
-                return new List<Guid>();
+            if (disponibilidadesMedico == null || !disponibilidadesMedico.Any())
+                return new List<object>();
+
+
+            List<object> results = [];
+
+            dbname = this._config.GetValue<string>("DatabaseName");
+
+            StringBuilder query = new();
+            query.Append($@"INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
+                            ([Id], [DiaSemana], [InicioPeriodo], [FimPeriodo], [Validade], [IdMedico]) VALUES ");
+
+            int validados = 0;
+            foreach (var d in disponibilidadesMedico)
+            {
+                Guid idDisponibilidadeMedico = Guid.NewGuid();
+                String result = String.Empty;
+                try
+                {
+                    ValidateDataValidade(d.Validade);
+                    ValidateHorario(d.InicioPeriodo, d.FimPeriodo);
+                    ValidateDisponibilidadeMedico(d.IdMedico, d.DiaSemana, d.InicioPeriodo, d.FimPeriodo);
+                    {
+                        query.Append($@" ('{idDisponibilidadeMedico}', {d.DiaSemana}, '{d.InicioPeriodo}', '{d.FimPeriodo}', '{d.Validade}', '{d.IdMedico}')");
+                        if (d != disponibilidadesMedico.Last())
+                            query.Append(", ");
+                        result = "Periodo de disponibilidade cadastrado com sucesso.";
+                        validados++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result = e.Message;
+                }
+
+                results.Add(new { id = idDisponibilidadeMedico, message = result });
+            }
 
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
@@ -25,49 +60,26 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             using (sqldb.Connection)
             {
-                List<Guid> ids = new List<Guid>();
-
-                Guid idDisponibilidadeMedico = Guid.NewGuid();
-
-                dbname = this._config.GetValue<string>("DatabaseName");
-
-                StringBuilder query = new StringBuilder();
-                query.Append($@"INSERT INTO {dbname}.dbo.DisponibilidadeMedico 
-                                ([Id], [DiaSemana], [InicioPeriodo], [FimPeriodo], [Validade], [IdMedico]) VALUES ");
-
-                foreach (var d in disponibilidadesMedico)
+                if (validados > 0)
                 {
-                    try
-                    {
-                        ValidadeDataValidade(d.Validade);
-                        ValidadeHorario(d.InicioPeriodo, d.FimPeriodo);
-                        query.Append($@"VALUES 
-                                        ('{Guid.NewGuid()}', {d.DiaSemana}, '{d.InicioPeriodo}', '{d.FimPeriodo}', '{d.Validade}', '{d.IdMedico}')");
-                        if (d != disponibilidadesMedico.Last())
-                            query.Append(", ");
-                        ids.Add(idDisponibilidadeMedico);
+                    sqldb.Connection.Open();
 
-                    }
-                    catch (Exception e)
-                    {
-                        throw new Exception(e.Message);
-                    }
+                    SqlCommand command = new(query.ToString(), sqldb.Connection);
+
+                    command.ExecuteNonQuery();
                 }
-
-                sqldb.Connection.Open();
-                SqlCommand command = new(query.ToString(), sqldb.Connection);
-
-                command.ExecuteNonQuery();
-                sqldb.Connection.Close();
-                return ids;
             }
-           
+            return results;
+
         }
         public void Put(String idMedico, String idDisponibilidadeMedico, DisponibilidadeMedico disponibilidadeMedico)
         {
-            ValidadeDataValidade(disponibilidadeMedico.Validade);
-            ValidadeHorario(disponibilidadeMedico.InicioPeriodo, disponibilidadeMedico.FimPeriodo);
-
+            ValidateDataValidade(disponibilidadeMedico.Validade);
+            ValidateHorario(disponibilidadeMedico.InicioPeriodo, disponibilidadeMedico.FimPeriodo);
+            ValidateDisponibilidadeMedico(disponibilidadeMedico.IdMedico,
+                                            disponibilidadeMedico.DiaSemana,
+                                            disponibilidadeMedico.InicioPeriodo,
+                                            disponibilidadeMedico.FimPeriodo);
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
             if (sqldb == null || sqldb.Connection == null)
@@ -145,14 +157,53 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                                   ,[FimPeriodo]
                                   ,[Validade]
                                   ,[IdMedico]
-                              FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico]");
-                query.Append($"WHERE IdMedico = '{idMedico}'");
+                              FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico] ");
+                query.Append($"WHERE IdMedico = '{idMedico}' ");
                 query.Append($"AND CAST(InicioPeriodo AS DATE) = '{data.ToString("yyyy-MM-dd")}'");
 
                 IEnumerable<DisponibilidadeMedico> result = sqldb.Connection.Query<DisponibilidadeMedico>(
                     query.ToString(), param: null);
 
                 sqldb.Connection.Close();
+                return result;
+            }
+        }
+
+
+        public IEnumerable<DisponibilidadeMedico> Get(string idMedico, int diaSemana)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                dbname = this._config.GetValue<string>("DatabaseName");
+                query.Append($@"SELECT [Id]
+                                  ,[DiaSemana]
+                                  ,[InicioPeriodo]
+                                  ,[FimPeriodo]
+                                  ,[Validade]
+                                  ,[IdMedico]
+                              FROM [HealthMedAgendamento].[dbo].[DisponibilidadeMedico] ");
+                query.Append($"WHERE IdMedico = '{idMedico}' ");
+                query.Append($"AND [DiaSemana] = {diaSemana}");
+
+                //IEnumerable<DisponibilidadeMedico> result = sqldb.Connection.Query<DisponibilidadeMedico>(
+                //    query.ToString(), param: null);
+
+                var result = sqldb.Connection.Query(query.ToString())
+                    .Select(r => new DisponibilidadeMedico
+                    {
+                        DiaSemana = r.DiaSemana,
+                        InicioPeriodo = r.InicioPeriodo,
+                        FimPeriodo = r.FimPeriodo,
+                        Validade = r.Validade,
+                        IdMedico = Guid.Parse(r.IdMedico)
+                    }).ToList();
+
                 return result;
             }
         }
@@ -172,7 +223,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public void ValidadeDataValidade(DateTime dataValidade)
+        public void ValidateDataValidade(DateTime dataValidade)
         {
             if (dataValidade < DateTime.Now)
             {
@@ -180,11 +231,28 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public void ValidadeHorario(TimeSpan inicio, TimeSpan fim)
+        public void ValidateHorario(TimeSpan inicio, TimeSpan fim)
         {
             if (inicio > fim)
             {
                 throw new Exception("Horário de Início não pode ser superior ao Horário de Fim.");
+            }
+        }
+
+        public void ValidateDisponibilidadeMedico(Guid idMedico, int diaSemana, TimeSpan inicioPeriodo, TimeSpan fimPeriodo)
+        {
+            List<DisponibilidadeMedico> DisponibilidadesMedico = Get(idMedico.ToString(), diaSemana).ToList();
+
+            foreach (var d in DisponibilidadesMedico)
+            {
+                //Verificar se o agendamento a ser criado não ira conflitar com os horarios já obtidos na base
+                if (d.DiaSemana == diaSemana)
+                {
+                    if (inicioPeriodo >= d.InicioPeriodo && fimPeriodo <= d.FimPeriodo)
+                    {
+                        throw new Exception("Horário de disponibilidade conflitante com outro horário já cadastrado.");
+                    }
+                }
             }
         }
     }

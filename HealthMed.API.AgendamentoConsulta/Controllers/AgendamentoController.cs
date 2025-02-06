@@ -19,19 +19,18 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <summary>
         /// Cadastro de Agendamento
         /// </summary>
+        /// <param name="notify"></param>
         /// <param name="value"></param>
         /// <returns></returns>
         [Authorize(Roles = "Paciente")]
 
         [HttpPost("/api/Agendamento/")]
-        public IActionResult Post([FromBody] Agendamento value)
+        public IActionResult Post([FromQuery] Boolean notify, [FromBody] Agendamento value)
         {
             Guid idAgendamento = _agendamentoRepository.Post(value);
-            _logger.LogInformation("Agendamento cadastrado com sucesso.");
 
-#if (!DEBUG)
-            _agendamentoRepository.NotificarAgendamento(idAgendamento);
-#endif
+            if (notify)
+                _agendamentoRepository.NotificarAgendamento(idAgendamento);
 
             return Ok(new
             {
@@ -74,17 +73,19 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <summary>
         /// Aprovar Agendamento
         /// </summary>
+        /// <param name="notify"></param>
         /// <param name="idAgendamento"></param>
         /// <returns></returns>
         [Authorize(Roles = "Medico")]
 
         [HttpPut("/api/Agendamento/AprovarAgendamento/{idAgendamento}")]
-        public IActionResult AprovarAgendamento(String idAgendamento)
+        public IActionResult AprovarAgendamento([FromQuery] Boolean notify, String idAgendamento)
         {
             _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.Aprovado);
-#if (!DEBUG)
-            _agendamentoRepository.NotificarAprovacao(new Guid(idAgendamento));
-#endif
+
+            if (notify)
+                _agendamentoRepository.NotificarAprovacao(new Guid(idAgendamento));
+
             _logger.LogInformation("Agendamento aprovado com sucesso.");
 
             return Ok(new
@@ -98,18 +99,19 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <summary>
         /// Recusar Agendamento
         /// </summary>
+        /// <param name="notify"></param>
         /// <param name="idAgendamento"></param>
         /// <returns></returns>
         [Authorize(Roles = "Medico")]
 
         [HttpPut("/api/Agendamento/RecusarAgendamento/{idAgendamento}")]
-        public IActionResult RecusarAgendamento(String idAgendamento)
+        public IActionResult RecusarAgendamento([FromQuery] Boolean notify, String idAgendamento)
         {
             _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.RecusadoPeloMedico);
 
-#if (!DEBUG)
-            _agendamentoRepository.NotificarRecusa(new Guid(idAgendamento));
-#endif
+            if (notify)
+                _agendamentoRepository.NotificarRecusa(new Guid(idAgendamento));
+
             _logger.LogInformation("Agendamento recusado.");
 
             return Ok(new
@@ -123,24 +125,25 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         /// <summary>
         /// Cancelar Agendamento
         /// </summary>
+        /// <param name="notify"></param>
         /// <param name="idAgendamento"></param>
         /// <param name="Motivo"></param>
         /// <returns></returns>
         [Authorize(Roles = "Paciente")]
 
         [HttpPut("/api/Agendamento/CancelarAgendamento/{idAgendamento}")]
-        public IActionResult CancelarAgendamento(String idAgendamento, [BindRequired] String Motivo)
+        public IActionResult CancelarAgendamento([FromQuery] Boolean notify, String idAgendamento, [FromBody][BindRequired] String Motivo)
         {
             _agendamentoRepository.AlterarStatusAgendamento(new Guid(idAgendamento), (int)StatusAgendamento.RecusadoPeloMedico, Motivo);
 
-#if (!DEBUG)
-            _agendamentoRepository.NotificarCancelamento(new Guid(idAgendamento), Motivo);
-#endif
+            if (notify)
+                _agendamentoRepository.NotificarCancelamento(new Guid(idAgendamento), Motivo);
+
             _logger.LogInformation("Agendamento cancelado.");
 
             return Ok(new
             {
-                Message = "Agendamento recusado.",
+                Message = "Agendamento cancelado.",
                 Id = idAgendamento
             });
         }

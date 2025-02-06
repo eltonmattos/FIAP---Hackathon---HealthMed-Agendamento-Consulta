@@ -30,7 +30,8 @@ namespace HealthMed.API.AgendamentoConsulta.Services
                 PlainText = mailRequest.Body
             };
 
-            List<EmailAddress> toRecipients = new List<EmailAddress>();
+            List<EmailAddress> toRecipients = new();
+
             toRecipients.Add(new(mailRequest.To));
             if (mailRequest.Cc != null)
                 toRecipients.Add(new(mailRequest.Cc));

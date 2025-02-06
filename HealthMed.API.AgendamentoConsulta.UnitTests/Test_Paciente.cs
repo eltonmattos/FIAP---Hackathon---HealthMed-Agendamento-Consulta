@@ -9,8 +9,19 @@ using System.Threading.Tasks;
 
 namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
-    public class Test_Paciente: IDisposable
+    [CollectionDefinition("Test_MedicoDependent")]
+    public class Test_Paciente_Login()
     {
+        [Fact]
+        public async void EfetuaLoginComFalha()
+        {
+            var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
+            // Act.
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha121%40");
+            // Assert.
+            Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
+        }
+
         [Fact]
         public async void EfetuaLoginComSucesso()
         {
@@ -22,16 +33,12 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
             Assert.True(!String.IsNullOrEmpty(token));
         }
+    }
 
-        [Fact]
-        public async void EfetuaLoginComFalha()
-        {
-            var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
-            // Act.
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha121%40");
-            // Assert.
-            Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
-        }
+    [CollectionDefinition("Test_Paciente_LoginDependent")]
+    public class Test_Paciente: IDisposable
+    {
+        Boolean emailNotify = false;
 
         [Fact]
         public async void ListaMedicos_NaoAutorizado()
@@ -83,14 +90,14 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440002");
             Guid idPaciente = new("660e8400-e29b-41d4-a716-446655440000");
 
-            Agendamento agendamento = new(new DateTime(2025, 02, 10, 11, 0, 0), new DateTime(2025, 02, 10, 11, 30, 0), idMedico, idPaciente);
+            Agendamento agendamento = new(new DateTime(2025, 02, 10, 09, 0, 0), new DateTime(2025, 02, 10, 09, 30, 0), idMedico, idPaciente);
 
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
             var sendContent = agendamento;
             var expectedContent = "Agendamento cadastrado com sucesso.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await TestHelpers._httpClient.PostAsync("/api/Agendamento/", TestHelpers.GetJsonStringContent(sendContent));
+            var response = await TestHelpers._httpClient.PostAsync($"/api/Agendamento?notify={emailNotify}", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
@@ -108,20 +115,22 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public async void CancelarAgendamento()
         {
             String? token = String.Empty;
-            Guid idAgendamento = new("35ddfab0-5496-46fd-95f3-43d651bb473b");
+            Guid idAgendamento = new("74de47aa-8af9-4770-a2e7-072b019503ff");
             HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginPaciente/LoginPaciente?email=ana.pereira%40example.com&password=Senha123%40");
             token = await TestHelpers.GetToken(tokenResponse);
+
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var sendContent = "Motivo do Cancelamento";
             var expectedContent = "Agendamento cancelado.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/CancelarAgendamento/{idAgendamento}", null);
+            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/CancelarAgendamento/{idAgendamento}?notify={emailNotify}", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
 
-            new AgendamentoRepository(TestHelpers.GetConfiguration()).AlterarStatusAgendamento(idAgendamento, 0);
+            new AgendamentoRepository(TestHelpers.GetConfiguration()).ReativarAgendamento(idAgendamento);
         }
 
         [Fact]
@@ -135,15 +144,13 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             Agendamento agendamento = new(new DateTime(2025, 02, 10, 10, 0, 0), new DateTime(2025, 02, 10, 10, 30, 0), idMedico, idPaciente);
 
-            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
             var sendContent = agendamento;
-            var expectedContent = "Agendamento cadastrado com sucesso.";
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/Agendamento/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
-            Assert.True(message.IndexOf(expectedContent) > 0);
         }
 
         [Fact]
@@ -158,9 +165,9 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             Agendamento agendamento = new(new DateTime(2025, 02, 09, 10, 0, 0), new DateTime(2025, 02, 09, 10, 30, 0), idMedico, idPaciente);
 
-            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = agendamento;
-            var expectedContent = "Agendamento cadastrado com sucesso.";
+            var expectedContent = "Horário não disponível";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await TestHelpers._httpClient.PostAsync("/api/Agendamento/", TestHelpers.GetJsonStringContent(sendContent));
@@ -168,11 +175,6 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            ExpandoObject? ob = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(message);
-            Guid idAgendamento = new(ob.Last().Value.ToString());
-            AgendamentoRepository agendamentoRepository = new(TestHelpers.GetConfiguration());
-            agendamentoRepository.Delete(idAgendamento);
         }
 
         [Fact]
@@ -186,9 +188,9 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             Agendamento agendamento = new(new DateTime(2025, 02, 10, 13, 00, 0), new DateTime(2025, 02, 10, 13, 30, 0), idMedico, idPaciente);
 
-            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
             var sendContent = agendamento;
-            var expectedContent = "Agendamento cadastrado com sucesso.";
+            var expectedContent = "Horário não disponível";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await TestHelpers._httpClient.PostAsync("/api/Agendamento/", TestHelpers.GetJsonStringContent(sendContent));
@@ -196,11 +198,6 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
-
-            ExpandoObject? ob = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(message);
-            Guid idAgendamento = new(ob.Last().Value.ToString());
-            AgendamentoRepository agendamentoRepository = new(TestHelpers.GetConfiguration());
-            agendamentoRepository.Delete(idAgendamento);
         }
 
 

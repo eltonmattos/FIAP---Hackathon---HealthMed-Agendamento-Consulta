@@ -27,7 +27,6 @@ namespace HealthMed.API.AgendamentoConsulta.Models
             this.Nome = Nome;
             this.CPF = CPF;
             this.CRM = CRM;
-            this.Senha = Senha;
             this.Email = Email;
             this.DuracaoConsulta = DuracaoConsulta;
             this.ValorConsulta = valorConsulta;

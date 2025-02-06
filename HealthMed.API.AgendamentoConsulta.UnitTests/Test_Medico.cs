@@ -12,7 +12,14 @@ using System.Threading.Tasks;
 
 namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
-    public class Test_Medico: IDisposable
+    public class RetornoDisponibilidadeMedico
+    {
+        public string id { get; set; }
+        public string message { get; set; }
+
+    }
+
+    public class Test_Medico_Login
     {
         [Fact]
         public async void EfetuaLoginComSucesso()
@@ -36,21 +43,21 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             Assert.Equal(expectedStatusCode, tokenResponse.StatusCode);
         }
 
+    }
+    [CollectionDefinition("Test_Medico_LoginDependent")]
+    public class Test_Medico: IDisposable
+    {
+        Boolean emailNotify = false;  
         [Fact]
         public async void CriaDisponibilidadeAgendamento_NaoAutorizado()
         {
-            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginMedico/LoginMedico?crm=123456-SP&password=Senha122%40");
-            String? token = await TestHelpers.GetToken(tokenResponse);
-
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            DisponibilidadeMedico disponibilidadeMedico = new(idMedico,
-                                                              (int)DayOfWeek.Monday,
-                                                              new TimeSpan(8, 0, 0),
-                                                              new TimeSpan(12, 0, 0),
-                                                              new DateTime(2025, 12, 31));
-            //Guid idDisponibilidade = disponibilidadeMedico.Id;
+            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)));
+
             var expectedStatusCode = System.Net.HttpStatusCode.Unauthorized;
-            var sendContent = disponibilidadeMedico;
+            var sendContent = disponibilidades;
             // Act.
             var response = await TestHelpers._httpClient.PostAsync("/api/DisponibilidadeMedico/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
@@ -66,41 +73,69 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
             List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)));
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)));
 
             var expectedStatusCode = System.Net.HttpStatusCode.OK;
             var sendContent = disponibilidades;
-            var expectedContent = "Período de Disponibilidade cadastrado com sucesso.";
+            var expectedContent = "Periodo de disponibilidade cadastrado com sucesso.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await TestHelpers._httpClient.PostAsync("/api/DisponibilidadeMedico/", TestHelpers.GetJsonStringContent(sendContent));
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
-            Assert.True(message.IndexOf(expectedContent) > 0);
 
-            ExpandoObject? ob = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(message);
-            Guid idDisponibilidade = new(ob.Last().Value.ToString());
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
-            disponibilidadeMedicoRepository.Delete(idDisponibilidade);
+            List<RetornoDisponibilidadeMedico>? ob = System.Text.Json.JsonSerializer.Deserialize<List<RetornoDisponibilidadeMedico>>(message); ;
+            foreach (var d in ob)
+            {
+                Assert.True(d.message == expectedContent);
+                disponibilidadeMedicoRepository.Delete(new Guid(d.id));
+            }
         }
+
+        [Fact]
+        public async void CriaDisponibilidadeAgendamento_SemDisponibilidadeHorario()
+        {
+            HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginMedico/LoginMedico?crm=123456-SP&password=Senha123%40");
+            String? token = await TestHelpers.GetToken(tokenResponse);
+
+            Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
+            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(9, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
+            
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var sendContent = disponibilidades;
+            var expectedContent = "Horário de disponibilidade conflitante com outro horário já cadastrado.";
+            // Act.
+            TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await TestHelpers._httpClient.PostAsync("/api/DisponibilidadeMedico/", TestHelpers.GetJsonStringContent(sendContent));
+            string message = await response.Content.ReadAsStringAsync();
+            // Assert.
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+
+            DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
+            List<RetornoDisponibilidadeMedico>? ob = System.Text.Json.JsonSerializer.Deserialize<List<RetornoDisponibilidadeMedico>>(message);
+            foreach (var d in ob)
+            {
+                Assert.True(d.message == expectedContent);
+            }
+        }
+
 
         [Fact]
         public async void CriaDisponibilidadeAgendamento_IntervaloHorarioInvalido()
         {
-            String? token = String.Empty;
             HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginMedico/LoginMedico?crm=123456-SP&password=Senha123%40");
-            token = await TestHelpers.GetToken(tokenResponse);
+            String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            DisponibilidadeMedico disponibilidadeMedico = new(idMedico,
-                                                              (int)DayOfWeek.Monday,
-                                                              new TimeSpan(12, 0, 0),
-                                                              new TimeSpan(10, 0, 0),
-                                                              new DateTime(2025, 12, 31));
-            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
-            var sendContent = disponibilidadeMedico;
+            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(12, 0, 0), new TimeSpan(11, 0, 0), new DateTime(2025, 4, 1)));
+
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var sendContent = disponibilidades;
             var expectedContent = "Horário de Início não pode ser superior ao Horário de Fim.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -108,7 +143,14 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
-            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
+            List<RetornoDisponibilidadeMedico>? ob = System.Text.Json.JsonSerializer.Deserialize<List<RetornoDisponibilidadeMedico>>(message); ;
+            foreach (var d in ob)
+            {
+                Assert.True(d.message == expectedContent);
+                disponibilidadeMedicoRepository.Delete(new Guid(d.id));
+            }
         }
 
         [Fact]
@@ -118,13 +160,11 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            DisponibilidadeMedico disponibilidadeMedico = new(idMedico,
-                                                              (int)DayOfWeek.Monday,
-                                                              new TimeSpan(12, 0, 0),
-                                                              new TimeSpan(10, 0, 0),
-                                                              new DateTime(2024, 12, 31));
-            var expectedStatusCode = System.Net.HttpStatusCode.InternalServerError;
-            var sendContent = disponibilidadeMedico;
+            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
+            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2023, 4, 1)));
+
+            var expectedStatusCode = System.Net.HttpStatusCode.OK;
+            var sendContent = disponibilidades;
             var expectedContent = "Data de Validade não pode ser inferior a Data Atual.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -132,23 +172,29 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
-            Assert.True(message.IndexOf(expectedContent) > 0);
+
+            DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
+            List<RetornoDisponibilidadeMedico>? ob = System.Text.Json.JsonSerializer.Deserialize<List<RetornoDisponibilidadeMedico>>(message); ;
+            foreach (var d in ob)
+            {
+                Assert.True(d.message == expectedContent);
+                disponibilidadeMedicoRepository.Delete(new Guid(d.id));
+            }
         }
 
         [Fact]
         public async void AlteraDisponibilidadeAgendamento_DisponibilidadeAlteradaComSucesso()
         {
-            String? token = String.Empty;
-            Guid idDisponibilidadeMedico = new("770e8400-e29b-41d4-a716-446655440009");
+            Guid idDisponibilidadeMedico = new("770e8400-e29b-41d4-a716-446655440000");
             HttpResponseMessage tokenResponse = await TestHelpers.RequestToken(@$"api/Auth/LoginMedico/LoginMedico?crm=123456-SP&password=Senha123%40");
-            token = await TestHelpers.GetToken(tokenResponse);
+            String? token = await TestHelpers.GetToken(tokenResponse);
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
             DisponibilidadeMedico disponibilidadeMedico = new(idMedico,
-                                                              (int)DayOfWeek.Monday,
-                                                              new TimeSpan(12, 0, 0),
+                                                              (int)DayOfWeek.Saturday,
                                                               new TimeSpan(10, 0, 0),
-                                                              new DateTime(2024, 12, 31)); var expectedStatusCode = System.Net.HttpStatusCode.OK;
+                                                              new TimeSpan(12, 0, 0),
+                                                              new DateTime(2025, 12, 31)); var expectedStatusCode = System.Net.HttpStatusCode.OK;
             var sendContent = disponibilidadeMedico;
             var expectedContent = "Período de Disponibilidade cadastrado com sucesso.";
             // Act.
@@ -159,6 +205,13 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
+
+            disponibilidadeMedico = new(idMedico,
+                                                              (int)DayOfWeek.Monday,
+                                                              new TimeSpan(9, 0, 0),
+                                                              new TimeSpan(12, 0, 0),
+                                                              new DateTime(2025, 12, 31));
+            new DisponibilidadeMedicoRepository(TestHelpers.GetConfiguration()).Put(idMedico.ToString(), idDisponibilidadeMedico.ToString(), disponibilidadeMedico);
         }
 
         [Fact]
@@ -171,13 +224,13 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             var expectedContent = "Agendamento aprovado com sucesso.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token); 
-            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/AprovarAgendamento/{idAgendamento}", null);
+            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/AprovarAgendamento/{idAgendamento}?notify={emailNotify}", null);
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
 
-            new AgendamentoRepository(TestHelpers.GetConfiguration()).AlterarStatusAgendamento(idAgendamento, 0);
+            new AgendamentoRepository(TestHelpers.GetConfiguration()).ReativarAgendamento(idAgendamento);
         }
 
         [Fact]
@@ -190,17 +243,18 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
             var expectedContent = "Agendamento recusado.";
             // Act.
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/RecusarAgendamento/{idAgendamento}", null);
+            var response = await TestHelpers._httpClient.PutAsync($"/api/Agendamento/RecusarAgendamento/{idAgendamento}?notify={emailNotify}", null);
             string message = await response.Content.ReadAsStringAsync();
             // Assert.
             Assert.Equal(expectedStatusCode, response.StatusCode);
             Assert.True(message.IndexOf(expectedContent) > 0);
 
-            new AgendamentoRepository(TestHelpers.GetConfiguration()).AlterarStatusAgendamento(idAgendamento, 0);
+            new AgendamentoRepository(TestHelpers.GetConfiguration()).ReativarAgendamento(idAgendamento);
         }
 
         public void Dispose()
         {
+            String? token = String.Empty;
             TestHelpers._httpClient.DefaultRequestHeaders.Authorization = null;
             TestHelpers._httpClient.DeleteAsync("/state").GetAwaiter().GetResult();
             GC.SuppressFinalize(this);

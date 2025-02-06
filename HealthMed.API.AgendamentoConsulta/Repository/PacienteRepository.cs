@@ -83,7 +83,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 var query = new StringBuilder();
                 query.Append(@$"DELETE FROM [HealthMedAgendamento].[dbo].[Paciente] WHERE [Email] = '{email}' ");
 
-                IEnumerable<Paciente> result = sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
+                sqldb.Connection.Query<Paciente>(query.ToString(), param: null);
 
                 sqldb.Connection.Close();
             }

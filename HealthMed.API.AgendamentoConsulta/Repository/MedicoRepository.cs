@@ -96,7 +96,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             using (sqldb.Connection)
             {
                 var query = new StringBuilder();
-                query.Append(@$"SELECT [Nome],[CPF],[CRM],[Email],[DuracaoConsulta], [ValorConsulta]
+                query.Append(@$"SELECT [Nome],[Email],[CPF],[CRM],[DuracaoConsulta],[ValorConsulta]
                               FROM [HealthMedAgendamento].[dbo].[Medico] WHERE [Id] = '{idMedico}' ");
 
                 IEnumerable<Medico> result = sqldb.Connection.Query<Medico>(query.ToString(), param: null);
@@ -188,6 +188,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         /// </summary>
         /// <param name="email"></param>
         /// <param name="cpf"></param>
+        /// <param name="crm"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public void ValidateMedicoExiste(String email, String cpf, String crm)

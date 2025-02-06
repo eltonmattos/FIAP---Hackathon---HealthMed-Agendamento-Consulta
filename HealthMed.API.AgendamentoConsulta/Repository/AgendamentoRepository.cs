@@ -22,7 +22,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             if (DateTime.Compare(agendamento.DataInicio, agendamento.DataFim) >= 0)
                 throw new Exception("Data de início não pode ser menor ou igual à data fim");
 
-            if (VerificarDisponibilidadeMedico(agendamento) || VerificarAgendamentosMedico(agendamento))
+            if (!VerificarDisponibilidadeMedico(agendamento) || !VerificarAgendamentosMedico(agendamento))
                 throw new Exception("Horário não disponível");
 
             var medico = new MedicoRepository(this._config).Get(agendamento.IdMedico.ToString());
@@ -51,7 +51,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     '{agendamento.DataFim.ToString("s")}',
                     '{agendamento.IdMedico}',
                     '{agendamento.IdPaciente}',
-                    {medico.ValorConsulta},
+                    '{medico.ValorConsulta}',
                     {(Int32)StatusAgendamento.Solicitado}
                 )");
 
@@ -169,6 +169,29 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
+
+        public void ReativarAgendamento(Guid idAgendamento)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                dbname = this._config.GetValue<string>("DatabaseName");
+                query.Append($@"UPDATE {dbname}.dbo.Agendamento SET
+                    [Status] = 0, [MotivoCancelamento] = NULL ");
+                query.Append($"WHERE Id = '{idAgendamento}'");
+
+                sqldb.Connection.Open();
+                SqlCommand command = new(query.ToString(), sqldb.Connection);
+                command.ExecuteNonQuery();
+                sqldb.Connection.Close();
+            }
+        }
+
         public IEnumerable<Agendamento> Get(String idMedico)
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
@@ -214,8 +237,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         private bool VerificarDisponibilidadeMedico(Agendamento agendamento)
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(this._config);
-            IEnumerable<DisponibilidadeMedico> horariosDisponiveisMedico = [];
-            disponibilidadeMedicoRepository.Get(agendamento.IdMedico.ToString());
+            IEnumerable<DisponibilidadeMedico> horariosDisponiveisMedico = disponibilidadeMedicoRepository.Get(agendamento.IdMedico.ToString());
 
             int DiaSemana = (int)agendamento.DataInicio.DayOfWeek;
 
@@ -236,13 +258,11 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
             foreach (Agendamento a in agendamentos)
             {
-                if (DateTime.Compare(agendamento.DataInicio, a.DataInicio) >= 0 && DateTime.Compare(agendamento.DataInicio, a.DataFim) <= 0)
-                    return true;
-                if (DateTime.Compare(agendamento.DataFim, a.DataInicio) >= 0 && DateTime.Compare(agendamento.DataFim, a.DataFim) <= 0)
-                    return true;
+                if (DateTime.Compare(agendamento.DataInicio, a.DataInicio) >= 0 && DateTime.Compare(agendamento.DataFim, a.DataFim) <= 0)
+                    return false;
             }
 
-            return false;
+            return true;
         }
         /// <summary>
         /// Título do e-mail:
@@ -271,8 +291,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 {
                     To = medico.Email,
                     Subject = "Health&Med - Solicitação de consulta",
-                    Body = @$"Olá, Dr. <b>{medico.Nome}</b>! 
-                    O paciente <b>{paciente.Nome}</b> solicitou uma consulta.
+                    Body = @$"                    Olá, Dr. {medico.Nome}! 
+                    O paciente {paciente.Nome} solicitou uma consulta.
                     Data e horário: {agendamento.DataInicio:dd/MM/yyyy} às {agendamento.DataInicio:HH:mm}"
                 };
                 MailService mailService = new(this._config);
@@ -308,8 +328,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 {
                     To = paciente.Email,
                     Subject = "Health&Med - Solicitação de Consulta Aprovada",
-                    Body = @$"Olá, <b>{paciente.Nome}</b>.
-                    Sua solicitação de consulta foi aprovada pelo médico <b>{medico.Nome}</b>.
+                    Body = @$"                    Olá, {paciente.Nome}.
+                    Sua solicitação de consulta foi aprovada pelo médico {medico.Nome}.
                     Data e horário: {agendamento.DataInicio:dd/MM/yyyy} às {agendamento.DataInicio:HH:mm}"
                 };
                 MailService mailService = new(this._config);
@@ -344,8 +364,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 {
                     To = paciente.Email,
                     Subject = "Health&Med - Solicitação de Consulta Recusada",
-                    Body = @$"Olá, <b>{paciente.Nome}</b>
-                    Sua solicitação de consulta foi recusada pelo médico <b>{medico.Nome}</b>.
+                    Body = @$"                    Olá, {paciente.Nome}
+                    Sua solicitação de consulta foi recusada pelo médico {medico.Nome}.
                     Data e horário: {agendamento.DataInicio:dd/MM/yyyy} às {agendamento.DataInicio:HH:mm}"
                 };
                 MailService mailService = new(this._config);
@@ -370,10 +390,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 {
                     To = medico.Senha,
                     Subject = "Health&Med - Consulta Cancelada",
-                    Body = @$"Olá, Dr. <b>{medico.Nome}</b>!
+                    Body = @$"                    Olá, Dr. {medico.Nome}!
                     A consulta marcada para o dia
                     {agendamento.DataInicio:dd/MM/yyyy} às {agendamento.DataInicio:HH:mm}
-                    foi cancelada pelo paciente <b>{paciente.Nome}</b>.
+                    foi cancelada pelo paciente {paciente.Nome}.
                     Motivo: {motivo}"
                 };
 
