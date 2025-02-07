@@ -54,7 +54,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             }
         }
 
-        public IEnumerable<object> GetMedicos(String? especialidade, String? estado, String? crm)
+        public IEnumerable<object> GetMedicos(String? especialidade = "", String? estado = "", String? crm = "")
         {
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
             if (sqldb == null || sqldb.Connection == null)
@@ -78,12 +78,12 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                                 JOIN 
                                     dbo.Especialidades e ON re.IdEspecialidade = e.Id ");
 
-                if (especialidade != null)
+                if (!String.IsNullOrEmpty(especialidade))
                 {
                     query.Append("WHERE "); whereUsed = true;
                     query.Append($"e.Nome LIKE '%{especialidade}%' ");
                 }
-                if (estado != null)
+                if (!String.IsNullOrEmpty(estado))
                 {
                     if (!whereUsed) {
                         query.Append("WHERE "); whereUsed = true;
@@ -94,7 +94,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                     }
                     query.Append($" m.CRM LIKE '%{estado}%' ");
                 }
-                if (crm != null)
+                if (!String.IsNullOrEmpty(crm))
                 {
                     if (!whereUsed)
                     {
