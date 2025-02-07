@@ -46,7 +46,11 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             string message = await response.Content.ReadAsStringAsync();
             ExpandoObject? ob = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(message);
-            string? token = ob.First().Value.ToString();
+            if (ob == null || !ob.Any())
+            {
+                return null;
+            }
+            string? token = ob.First().Value?.ToString();
             return token;
         }
 

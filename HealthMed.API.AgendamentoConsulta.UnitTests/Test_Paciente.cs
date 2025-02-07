@@ -35,8 +35,6 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
     [CollectionDefinition("Test_Paciente_LoginDependent")]
     public class Test_Paciente: IDisposable
     {
-        Boolean emailNotify = false;
-
         [Fact]
         public void ListaMedicos()
         {

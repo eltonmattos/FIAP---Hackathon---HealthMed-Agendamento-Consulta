@@ -19,7 +19,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         public IEnumerable<object> Post(IEnumerable<DisponibilidadeMedico> disponibilidadesMedico)
         {
             if (disponibilidadesMedico == null || !disponibilidadesMedico.Any())
-                return new List<object>();
+                return [];
 
 
             List<object> results = [];
@@ -211,8 +211,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public string AIPost(string userPrompt, string idMedico)
         {
-            String apiKey = this._config.GetValue<String>("AIService:GeminiAPIKEY");
-            String apiUrl = this._config.GetValue<String>("AIService:GeminiBaseURL");
+            String? apiKey = _config.GetValue<String>("AIService:GeminiAPIKEY");
+            String? apiUrl = _config.GetValue<String>("AIService:GeminiBaseURL");
             if (String.IsNullOrEmpty(apiKey) || String.IsNullOrEmpty(apiUrl))
                 throw new Exception("API Key ou URL não configuradas.");
 
@@ -247,16 +247,18 @@ Caso o usuário não forneca as informações corretamente e não siga as regras
             JObject jsonObject = JObject.Parse(resultado);
 
             // Extrair o texto
-            string? texto = (string)jsonObject["candidates"][0]["content"]["parts"][0]["text"];
+            string? texto = (jsonObject["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.ToString()) ?? throw new Exception("Invalid response from AI service.");
+
             texto = texto.Replace("```json","").Replace("```", "");
 
             try
             {
                 DeleteAgenda(Guid.Parse(idMedico));
                 List<DisponibilidadeMedico>? disponibilidades = JsonSerializer.Deserialize<List<DisponibilidadeMedico>>(texto);
-                DisponibilidadeMedicoRepository disponibilidadeMedico = new DisponibilidadeMedicoRepository(_config);
-                if (disponibilidades!= null & disponibilidades.Any())
-                    disponibilidadeMedico.Post(disponibilidades);
+                DisponibilidadeMedicoRepository disponibilidadeMedico = new(_config);
+                if (disponibilidades!= null)
+                    if (disponibilidades.Count != 0)
+                        disponibilidadeMedico.Post(disponibilidades);
                 return texto;
             }
             catch (Exception e)

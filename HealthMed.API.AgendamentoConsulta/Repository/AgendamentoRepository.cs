@@ -32,6 +32,9 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             if (sqldb == null || sqldb.Connection == null)
                 throw new Exception("SQL ERROR");
 
+            if (medico == null)
+                throw new Exception("Médico não encontrado");
+
             using (sqldb.Connection)
             {
                 Guid idAgendamento = Guid.NewGuid();
@@ -90,8 +93,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                         IdMedico = Guid.Parse(r.IdMedico),
                         IdPaciente = Guid.Parse(r.IdPaciente),
                         Status = (Int32)r.Status
-                    }).ToList().FirstOrDefault();
-
+                    }).ToList().FirstOrDefault() ?? throw new Exception("Agendamento não encontrado");
                 sqldb.Connection.Close();
                 return result;
             }
@@ -136,10 +138,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public void AlterarStatusAgendamento(Guid idAgendamento, Int32 status, String motivo="")
         {
-            Agendamento agendamento = GetAgendamento(idAgendamento.ToString());
-
-            if (agendamento == null)
-                throw new Exception("Agendamento não encontrado");
+            Agendamento agendamento = GetAgendamento(idAgendamento.ToString()) ?? throw new Exception("Agendamento não encontrado");
 
             if (agendamento.Status == (int)StatusAgendamento.CanceladoPeloPaciente ||
                 agendamento.Status == (int)StatusAgendamento.RecusadoPeloMedico)

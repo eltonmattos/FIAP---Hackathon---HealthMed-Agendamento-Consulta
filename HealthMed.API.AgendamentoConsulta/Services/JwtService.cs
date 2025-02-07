@@ -5,42 +5,67 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-public class JwtService
+namespace HealthMed.API.AgendamentoConsulta.Services
 {
-    private readonly string _secret;
-    private readonly string _issuer;
-    private readonly string _audience;
-    private readonly int _expirationMinutes;
-
-    public JwtService(IConfiguration config)
+    public class JwtService(IConfiguration config)
     {
-        _secret = config["JwtSettings:Secret"];
-        _issuer = config["JwtSettings:Issuer"];
-        _audience = config["JwtSettings:Audience"];
-        _expirationMinutes = int.Parse(config["JwtSettings:ExpirationMinutes"]);
-    }
+        public string? Secret { get; set; }
+        public string? Issuer { get; set; }
+        public string? Audience { get; set; }
+        public int ExpirationMinutes { get; set; }
 
-    public string GenerateToken(string email, string role)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_secret);
+        public readonly IConfiguration config = config;
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        public string GenerateToken(string email, string role)
         {
-            Subject = new ClaimsIdentity(new[]
+            if (config == null)
             {
-                new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, role)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(_expirationMinutes),
-            Issuer = _issuer,
-            Audience = _audience,
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature
-            )
-        };
+                throw new Exception(nameof(config));
+            }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            Secret ??= config["JwtSettings:Secret"];
+
+            if (Secret == null)
+            {
+                throw new Exception("Secret cannot be null");
+            }
+
+            Issuer ??= config["JwtSettings:Issuer"];
+            if (Issuer == null)
+            {
+                throw new Exception("Issuer cannot be null");
+            }
+
+            Audience ??= config["JwtSettings:Audience"];
+            if (Audience == null)
+            {
+                throw new Exception("Audience cannot be null");
+            }
+
+            var expirationMinutesString = config["JwtSettings:ExpirationMinutes"] ?? throw new Exception("ExpirationMinutes cannot be null");
+            ExpirationMinutes = int.Parse(expirationMinutesString);
+
+            byte[] key = Encoding.UTF8.GetBytes(Secret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                [
+                        new Claim(ClaimTypes.Email, email),
+                            new Claim(ClaimTypes.Role, role)
+                ]),
+                Expires = DateTime.UtcNow.AddMinutes(ExpirationMinutes),
+                Issuer = Issuer,
+                Audience = Audience,
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 }
