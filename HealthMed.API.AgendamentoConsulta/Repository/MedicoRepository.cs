@@ -17,6 +17,16 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid Post(Medico medico)
         {
+            ArgumentNullException.ThrowIfNull(medico);
+            if (String.IsNullOrEmpty(medico.Email))
+                throw new ArgumentException("Nome não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.CPF))  
+                throw new ArgumentException("CPF não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.CRM))
+                throw new ArgumentException("CRM não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.Senha))
+                throw new ArgumentException("Senha não pode ser nula");
+
             UsuarioRepository.ValidateEmail(medico.Email);
             UsuarioRepository.ValidateCPF(medico.CPF);
             UsuarioRepository.ValidatePassword(medico.Senha);
@@ -98,7 +108,7 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                 {
                     if (!whereUsed)
                     {
-                        query.Append("WHERE "); whereUsed = true;
+                        query.Append("WHERE "); 
                     }
                     else
                     {
@@ -138,6 +148,15 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
 
         public Guid HorarioDisponivel(Medico medico)
         {
+            ArgumentNullException.ThrowIfNull(medico);
+            if (String.IsNullOrEmpty(medico.Email))
+                throw new ArgumentException("Nome não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.CPF))
+                throw new ArgumentException("CPF não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.CRM))
+                throw new ArgumentException("CRM não pode ser nulo");
+            if (String.IsNullOrEmpty(medico.Senha))
+                throw new ArgumentException("Senha não pode ser nula");
             UsuarioRepository.ValidateEmail(medico.Email);
             UsuarioRepository.ValidateCPF(medico.CPF);
             UsuarioRepository.ValidatePassword(medico.Senha);
