@@ -16,8 +16,8 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 {
     public class RetornoDisponibilidadeMedico
     {
-        public string id { get; set; }
-        public string message { get; set; }
+        public required string Id { get; set; }
+        public required string Message { get; set; }
 
     }
 
@@ -42,17 +42,17 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
     [CollectionDefinition("Test_Medico_LoginDependent")]
     public class Test_Medico : IDisposable
     {
-        Boolean emailNotify = false;
-
         [Fact]
-        public async void CriaDisponibilidadeAgendamento_DisponibilidadeCriadaComSucesso()
+        public void CriaDisponibilidadeAgendamento_DisponibilidadeCriadaComSucesso()
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)));
+            List<DisponibilidadeMedico> disponibilidades =
+            [
+                new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)),
+                new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Saturday, new TimeSpan(13, 0, 0), new TimeSpan(17, 0, 0), new DateTime(2025, 4, 1)),
+            ];
 
             IEnumerable<object>? retornoDisponibilidades = disponibilidadeMedicoRepository.Post(disponibilidades);
 
@@ -60,19 +60,30 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             foreach (object r in retornoDisponibilidades)
             {
-                String? id = r.GetType().GetProperty("id").GetValue(r).ToString();
-                disponibilidadeMedicoRepository.Delete(Guid.Parse(id));
+                var property = r.GetType().GetProperty("id");
+                if (property != null)
+                {
+                    object? guid = property.GetValue(r);
+                    if (guid != null)
+                    {
+                        String? idRetorno = guid.ToString();
+                        if (idRetorno != null)
+                            disponibilidadeMedicoRepository.Delete(Guid.Parse(idRetorno));
+                    }
+                }
             }
         }
 
         [Fact]
-        public async void CriaDisponibilidadeAgendamento_SemDisponibilidadeHorario()
+        public void CriaDisponibilidadeAgendamento_SemDisponibilidadeHorario()
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(9, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)));
+            List<DisponibilidadeMedico> disponibilidades =
+            [
+                new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(9, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2025, 4, 1)),
+            ];
 
             IEnumerable<object>? retornoDisponibilidades = disponibilidadeMedicoRepository.Post(disponibilidades);
 
@@ -82,20 +93,31 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             foreach (object r in retornoDisponibilidades)
             {
-                String? content = r.GetType().GetProperty("message").GetValue(r).ToString();
-                Assert.Equal(expectedContent, content);
+                var property = r.GetType().GetProperty("message");
+                if (property != null)
+                {
+                    object? guid = property.GetValue(r);
+                    if (guid != null)
+                    {
+                        String? mensagemRetorno = guid.ToString();
+                        if (mensagemRetorno != null)
+                            Assert.Equal(expectedContent, mensagemRetorno);
+                    }
+                }
             }
         }
 
 
         [Fact]
-        public async void CriaDisponibilidadeAgendamento_IntervaloHorarioInvalido()
+        public void CriaDisponibilidadeAgendamento_IntervaloHorarioInvalido()
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(12, 0, 0), new TimeSpan(11, 0, 0), new DateTime(2025, 4, 1)));
+            List<DisponibilidadeMedico> disponibilidades =
+            [
+                new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(12, 0, 0), new TimeSpan(11, 0, 0), new DateTime(2025, 4, 1)),
+            ];
 
             IEnumerable<object>? retornoDisponibilidades = disponibilidadeMedicoRepository.Post(disponibilidades);
 
@@ -105,19 +127,30 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             foreach (object r in retornoDisponibilidades)
             {
-                String? content = r.GetType().GetProperty("message").GetValue(r).ToString();
-                Assert.Equal(expectedContent, content);
+                var property = r.GetType().GetProperty("message");
+                if (property != null)
+                {
+                    object? guid = property.GetValue(r);
+                    if (guid != null)
+                    {
+                        String? mensagemRetorno = guid.ToString();
+                        if (mensagemRetorno != null)
+                            Assert.Equal(expectedContent, mensagemRetorno);
+                    }
+                }
             }
         }
 
         [Fact]
-        public async void CriaDisponibilidadeAgendamento_DataValidadePassada()
+        public void CriaDisponibilidadeAgendamento_DataValidadePassada()
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
 
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
-            List<DisponibilidadeMedico> disponibilidades = new List<DisponibilidadeMedico>();
-            disponibilidades.Add(new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2023, 4, 1)));
+            List<DisponibilidadeMedico> disponibilidades =
+            [
+                new DisponibilidadeMedico(idMedico, (int)DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(12, 0, 0), new DateTime(2023, 4, 1)),
+            ];
 
             IEnumerable<object>? retornoDisponibilidades = disponibilidadeMedicoRepository.Post(disponibilidades);
 
@@ -127,8 +160,17 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
 
             foreach (object r in retornoDisponibilidades)
             {
-                String? content = r.GetType().GetProperty("message").GetValue(r).ToString();
-                Assert.Equal(expectedContent, content);
+                var property = r.GetType().GetProperty("message");
+                if (property != null)
+                {
+                    object? guid = property.GetValue(r);
+                    if (guid != null)
+                    {
+                        String? mensagemRetorno = guid.ToString();
+                        if (mensagemRetorno != null)
+                            Assert.Equal(expectedContent, mensagemRetorno);
+                    }
+                }
             }
         }
 

@@ -4,8 +4,8 @@ services:
     container_name: sql-server
     environment:
       ACCEPT_EULA: Y
-      SA_PASSWORD: EM$2303bd
-      attach_dbs: "[{'dbName':'TechChallenge','dbFiles':['/var/opt/mssql/data/TechChallenge.mdf' , '/var/opt/mssql/data/TechChallenge_log.ldf']}]"
+      SA_PASSWORD: example_123
+      attach_dbs: "[{'dbName':'TechChallenge','dbFiles':['/var/opt/mssql/data/HealthMedAgendamento.mdf' , '/var/opt/mssql/data/HealthMedAgendamento.ldf']}]"
     image: mcr.microsoft.com/mssql/server:latest
     restart: always
     healthcheck:
