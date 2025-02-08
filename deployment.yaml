@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hmpod
+  labels:
+    app: hmpod
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: hmpod
+  template:
+    metadata:
+      labels:
+        app: hmpod
+    spec:
+      containers:
+      - name: healthmed
+        image: eltonmattos/healthmed_agendamento:1dba2d685f782e5e046e50ce39d89305a838990d
+        ports:
+        - containerPort: 8080
