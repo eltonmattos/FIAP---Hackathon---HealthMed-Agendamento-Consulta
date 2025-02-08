@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_763dc1e1b7cc4d498e5ec8269b8719f1 }}/eltonmattos/healthmed_agendamento:${{ github.sha }}
-        file: ./HealthMed.API.AgendamentoConsulta/Dockerfile
+        file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
