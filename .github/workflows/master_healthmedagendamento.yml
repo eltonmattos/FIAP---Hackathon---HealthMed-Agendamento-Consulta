@@ -40,12 +40,29 @@ jobs:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
+    
     steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'healthmedagendamento'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4abc10d81ec6464bbec0c9e9a2ee5ffe }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_b75208283f49468ca7611856258a7f86 }}/healthmed_agendamento:${{ github.sha }}'
+    #- name: Deploy to Azure Web App
+    #  id: deploy-to-webapp
+    #  uses: azure/webapps-deploy@v2
+    #  with:
+    #    app-name: 'healthmedagendamento'
+    #    slot-name: 'production'
+    #    publish-profile: ${{ secrets.AzureAppService_PublishProfile_4abc10d81ec6464bbec0c9e9a2ee5ffe }}
+    #    images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_b75208283f49468ca7611856258a7f86 }}/healthmed_agendamento:${{ github.sha }}'
+
+      - name: Set up kubectl
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{secrets.KUBECONFIG}}
+          version: 1.21.0
+          
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          
+      - name: Wait for AKS Deploy
+        run: kubectl wait --for-condition=available
+    
