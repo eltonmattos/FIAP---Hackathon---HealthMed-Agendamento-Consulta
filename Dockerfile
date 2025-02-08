@@ -4,8 +4,8 @@ COPY . .
 
 RUN ls
 
-RUN dotnet restore "./HealthMed.API.AgendamentoConsulta.csproj" --disable-parallel
-RUN dotnet publish "./HealthMed.API.AgendamentoConsulta.csproj" -c release -o /app --no-restore
+RUN dotnet restore "./HealthMed.API.AgendamentoConsulta/HealthMed.API.AgendamentoConsulta.csproj" --disable-parallel
+RUN dotnet publish "./HealthMed.API.AgendamentoConsulta/HealthMed.API.AgendamentoConsulta.csproj" -c release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
