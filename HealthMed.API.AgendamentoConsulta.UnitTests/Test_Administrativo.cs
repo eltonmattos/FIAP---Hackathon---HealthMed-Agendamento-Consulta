@@ -20,7 +20,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         public void Paciente_POST_PacienteCadastradoComSucesso()
         {
             PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
-            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "P@ssw0rd");
+            Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@alfenasmail.com", "73121929046", "P@ssw0rd");
 
             Guid idPaciente = pacienteRepository.Post(paciente);
 
