@@ -1,6 +1,9 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /source
 COPY . .
+
+RUN ls
+
 RUN dotnet restore "./HealthMed.API.AgendamentoConsulta.csproj" --disable-parallel
 RUN dotnet publish "./HealthMed.API.AgendamentoConsulta.csproj" -c release -o /app --no-restore
 
