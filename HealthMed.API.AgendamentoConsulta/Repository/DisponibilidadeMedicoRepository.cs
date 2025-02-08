@@ -79,10 +79,10 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
         {
             ValidateDataValidade(disponibilidadeMedico.Validade);
             ValidateHorario(disponibilidadeMedico.InicioPeriodo, disponibilidadeMedico.FimPeriodo);
-            ValidateDisponibilidadeMedico(disponibilidadeMedico.IdMedico,
-                                            disponibilidadeMedico.DiaSemana,
-                                            disponibilidadeMedico.InicioPeriodo,
-                                            disponibilidadeMedico.FimPeriodo);
+            if(!ValidateSeExisteDisponibilidadeMedico(idDisponibilidadeMedico))
+            {
+                throw new Exception("Dispobilidade não encontrada");
+            }
             sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
 
             if (sqldb == null || sqldb.Connection == null)
@@ -240,6 +240,7 @@ Você deve responder em um JSon valido neste formato:
 
 Caso o usuário não forneca as informações corretamente e não siga as regras, você deverá retornar uma mensagem de erro informando o que está errado ao invés do JSON.
 
+- Hoje é {DateTime.Now.ToLongDateString()} 
 [PROMPT]{userPrompt}[/PROMPT]";
 
             String resultado = aiService.PromptApi(prompt).Result;
@@ -329,5 +330,32 @@ Caso o usuário não forneca as informações corretamente e não siga as regras
                 }
             }
         }
+
+        public bool ValidateSeExisteDisponibilidadeMedico(string idDisponibilidade)
+        {
+            return GetByIdDisponibilidade(idDisponibilidade.ToString());
+        }
+
+        public bool GetByIdDisponibilidade(string idDisponibilidade)
+        {
+            sqldb = new DBConnection(this._config.GetConnectionString("ConnectionString"));
+
+            if (sqldb == null || sqldb.Connection == null)
+                throw new Exception("SQL ERROR");
+
+            using (sqldb.Connection)
+            {
+                var query = new StringBuilder();
+                dbname = this._config.GetValue<string>("DatabaseName");
+                query.Append($@"SELECT 1
+                FROM [{dbname}].[dbo].[DisponibilidadeMedico]");
+                query.Append(" WHERE Id = @IdDisp");
+
+                var result = sqldb.Connection.Query(query.ToString(), new { IdDisp = idDisponibilidade.ToString() });
+                    
+                return result.Any();
+            }
+        }
+
     }
 }

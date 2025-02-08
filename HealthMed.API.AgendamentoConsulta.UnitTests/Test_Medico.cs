@@ -179,7 +179,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         {
             DisponibilidadeMedicoRepository disponibilidadeMedicoRepository = new(TestHelpers.GetConfiguration());
 
-            Guid idDisponibilidadeMedico = new("a09babc0-2985-49eb-8430-721c83824640");
+            Guid idDisponibilidadeMedico = new("665e0da5-b9e2-4bb3-8b53-2dcceca03a25");
             Guid idMedico = new("550e8400-e29b-41d4-a716-446655440000");
             DisponibilidadeMedico disponibilidadeMedico = new(idMedico,
                                                               (int)DayOfWeek.Saturday,
