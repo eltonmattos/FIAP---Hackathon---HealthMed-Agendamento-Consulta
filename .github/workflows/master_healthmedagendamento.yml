@@ -51,6 +51,8 @@ jobs:
     #    publish-profile: ${{ secrets.AzureAppService_PublishProfile_4abc10d81ec6464bbec0c9e9a2ee5ffe }}
     #    images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_b75208283f49468ca7611856258a7f86 }}/healthmed_agendamento:${{ github.sha }}'
 
+      - uses: actions/checkout@v2
+      
       - name: Set up kubectl
         uses: azure/k8s-set-context@v1
         with:
@@ -60,8 +62,8 @@ jobs:
           
       - name: Deploy to AKS
         run: |
-          kubectl apply -f ../../deployment.yaml
-          kubectl apply -f ../../service.yaml
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
           
       - name: Wait for AKS Deploy
         run: kubectl wait --for-condition=available
