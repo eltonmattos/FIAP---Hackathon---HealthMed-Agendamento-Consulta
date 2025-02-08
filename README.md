@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcionalidades para cadastro, cada uma com funcionalidades distintas. Utilizamos GitHub Actions para automatizar a construção e publicação das imagens Docker, garantindo um build isolado para cada API.
+Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcionalidades para que médicos possam cadastrar horários onde estão disponíveis para agendar consultas, e para que os pacientes possam localizar esses médicos e realizar o agendamento das consultas considerando os horários disponíveis para cada médico.
 
 - Acesso: http://128.203.145.89:8080/
 - Definições da API: [HealthMed API.postman_collection.json.zip](https://github.com/user-attachments/files/18722502/HealthMed.API.postman_collection.json.zip)
@@ -65,17 +65,22 @@ Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcional
 
 ## Persistência de Dados
 
+![027b1b4b-061d-435d-a617-b22b0440415e](https://github.com/user-attachments/assets/9c4bb09b-a20e-4235-a0d2-556dbb608790)
+
 Usamos o Dapper para alta performance e simplicidade na manipulação de dados, permitindo consultas rápidas e eficientes, com baixo overhead, em um ambiente seguro e escalável. Isso melhora a velocidade e a produtividade do desenvolvimento.
 
 API está hospedada no Azure SQL, que oferece escalabilidade, alta disponibilidade, segurança robusta, integração simplificada com outras ferramentas do Azure. Essa combinação melhora o desempenho e a eficiência da API.
 
 ## Testes
 
-O projeto inclui testes unitários para garantir a qualidade e a funcionalidade das APIs.
+O projeto inclui testes unitários para garantir a qualidade e a funcionalidade das APIs. 
 
 ## Serviço de Notificação
 
-O projeto inclui o Azure Communication Services para disparo de emails, que oferece integração fácil com outros serviços Azure, alta escalabilidade, segurança robusta e capacidade de rastreamento e análise de métricas, melhorando a eficiência e o gerenciamento das comunicações por email.
+O projeto inclui o Azure Communication Services para disparo de Emails, que oferece integração fácil com outros serviços Azure, alta escalabilidade, segurança robusta e capacidade de rastreamento e análise de métricas, melhorando a eficiência e o gerenciamento das comunicações por email.
+- Email para notificar o médico sobre uma nova solicitação de agendamento
+- Email para notificar o médico sobre o cancelamento de uma solicitação
+- Email para notificar o paciente sobre aprovação/recusa de agendamento
 
 ## Orquestração e Gerenciamento de Containeres
 
