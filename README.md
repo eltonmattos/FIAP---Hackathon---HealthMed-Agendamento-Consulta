@@ -34,31 +34,6 @@ Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcional
    - `PUT /api/Agendamento/RecusarAgendamento/{idMedico}` → Recusar um agendamento
    - `PUT /api/Agendamento/CancelarAgendamento/{idMedico}` → Cancelar um agendamento
 
-## Estrutura da API
-
-- **Autenticação**
-   - `POST /auth/LoginMedico` → Login do médico, usando o CRM
-   - `POST /auth/LoginPaciente` → Login do paciente, usando o endereço de E-Mail
-- **Médico**
-   - `GET /api/Medico/{idMedico}` → Buscar informações de um médico
-   - `GET /api/Medico` → Buscar médicos filtrando por especialidade, estado ou CRM
-   - `POST /api/Medico` → Cadastrar um novo médico
-- **Paciente**
-   - `GET /api/Paciente/{idPaciente}` → Buscar informações de um paciente
-   - `POST /api/Paciente` → Cadastrar um novo paciente
-- **Disponibilidade do Médico**
-   - `GET /api/DisponibilidadeMedico/{idMedico}` → Obter agenda de disponibilidade de um médico
-   - `POST /api/DisponibilidadeMedico` → Cadastrar disponibilidade de médicos
-   - `POST /api/DisponibilidadeMedico/{idMedico}` → Cadastrar disponibilidade de médicos, com apoio de inteligência artificial (utilizando o modelo gemini-2.0-flash)
-   - `PUT /api/DisponibilidadeMedico/{idMedico}/{idDisponibilidadeMedico}` → Atualizar bloco de disponibilidade
-- **Agendamentos**
-   - `GET /api/Agendamento/{idMedico}` → Listar agendamentos de um médico
-   - `GET /api/Agendamento/{idMedico}/{Data}` → Buscar agendamentos em uma data específica
-   - `POST /api/Agendamento` → Criar um novo agendamento
-   - `PUT /api/Agendamento/AprovarAgendamento/{idMedico}` → Aprovar um agendamento
-   - `PUT /api/Agendamento/RecusarAgendamento/{idMedico}` → Recusar um agendamento
-   - `PUT /api/Agendamento/CancelarAgendamento/{idMedico}` → Cancelar um agendamento
-
 ## Estrutura do Projeto
 
 ![azure drawio](https://github.com/user-attachments/assets/e8664873-1a87-48cb-9bb8-3e53145caadf)
