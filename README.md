@@ -1,13 +1,37 @@
 # Readme.MD
 
 ## Visão Geral
-[Uploading HealthMed API.postman_collection.json…]()
 
 Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcionalidades para cadastro, cada uma com funcionalidades distintas. Utilizamos GitHub Actions para automatizar a construção e publicação das imagens Docker, garantindo um build isolado para cada API.
 
 ## Estrutura da API
 
 ![azure-Página-2 drawio](https://github.com/user-attachments/assets/b279ea2a-b35c-4e10-907b-e39ef29458e5)
+
+- **Autenticação**
+   - `POST /auth/LoginMedico` → Login do médico, usando o CRM
+   - `POST /auth/LoginPaciente` → Login do paciente, usando o endereço de E-Mail
+- **Médico**
+   - `GET /api/Medico/{idMedico}` → Buscar informações de um médico
+   - `GET /api/Medico` → Buscar médicos filtrando por especialidade, estado ou CRM
+   - `POST /api/Medico` → Cadastrar um novo médico
+- **Paciente**
+   - `GET /api/Paciente/{idPaciente}` → Buscar informações de um paciente
+   - `POST /api/Paciente` → Cadastrar um novo paciente
+- **Disponibilidade do Médico**
+   - `GET /api/DisponibilidadeMedico/{idMedico}` → Obter agenda de disponibilidade de um médico
+   - `POST /api/DisponibilidadeMedico` → Cadastrar disponibilidade de médicos
+   - `POST /api/DisponibilidadeMedico/{idMedico}` → Cadastrar disponibilidade de médicos, com apoio de inteligência artificial (utilizando o modelo gemini-2.0-flash)
+   - `PUT /api/DisponibilidadeMedico/{idMedico}/{idDisponibilidadeMedico}` → Atualizar bloco de disponibilidade
+- **Agendamentos**
+   - `GET /api/Agendamento/{idMedico}` → Listar agendamentos de um médico
+   - `GET /api/Agendamento/{idMedico}/{Data}` → Buscar agendamentos em uma data específica
+   - `POST /api/Agendamento` → Criar um novo agendamento
+   - `PUT /api/Agendamento/AprovarAgendamento/{idMedico}` → Aprovar um agendamento
+   - `PUT /api/Agendamento/RecusarAgendamento/{idMedico}` → Recusar um agendamento
+   - `PUT /api/Agendamento/CancelarAgendamento/{idMedico}` → Cancelar um agendamento
+
+## Estrutura da API
 
 - **Autenticação**
    - `POST /auth/LoginMedico` → Login do médico, usando o CRM
