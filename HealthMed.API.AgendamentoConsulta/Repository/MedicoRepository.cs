@@ -27,6 +27,8 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
             if (String.IsNullOrEmpty(medico.Senha))
                 throw new ArgumentException("Senha não pode ser nula");
 
+            new MedicoRepository(_config).ValidateCRM(medico.CRM);
+
             UsuarioRepository.ValidateEmail(medico.Email);
             UsuarioRepository.ValidateCPF(medico.CPF);
             UsuarioRepository.ValidatePassword(medico.Senha);
