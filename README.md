@@ -1,51 +1,77 @@
-# Health&Med - Agendamentos de Consultas Médicas
+# Readme.MD
 
-API Backend para consulta, cadastro e notificações de Agendamentos de Consultas Médicas.
+## Visão Geral
 
-## Requisitos
+Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcionalidades para cadastro, cada uma com funcionalidades distintas. Utilizamos GitHub Actions para automatizar a construção e publicação das imagens Docker, garantindo um build isolado para cada API.
 
+## Estrutura do Projeto
 
-### Médico - Cadastro
+![azure.drawio.png](https://res.craft.do/user/full/3ab4dfab-d7a7-30aa-df9d-6c8f45a62baf/doc/fbbd7cf7-d761-4a69-95d3-366a1e98432a/77e0f50e-0ab2-4953-a3b4-a1f48cd1a3b6)
 
-- Cadastro do Usuário (Médico): O médico deverá poder se cadastrar, preenchendo os campos obrigatórios: Nome, CPF, Número CRM, E-mail e Senha.
+## Estrutura da API
 
-- Autenticação do Usuário (Médico): O sistema deve permitir que o médico faça login usando o E-Mail e uma Senha.
+- **Autenticação**
+   - `POST /auth/LoginMedico` → Login do médico, usando o CRM
+   - `POST /auth/LoginPaciente` → Login do paciente, usando o endereço de E-Mail
+- **Médico**
+   - `GET /api/Medico/{idMedico}` → Buscar informações de um médico
+   - `GET /api/Medico` → Buscar médicos filtrando por especialidade, estado ou CRM
+   - `POST /api/Medico` → Cadastrar um novo médico
+- **Paciente**
+   - `GET /api/Paciente/{idPaciente}` → Buscar informações de um paciente
+   - `POST /api/Paciente` → Cadastrar um novo paciente
+- **Disponibilidade do Médico**
+   - `GET /api/DisponibilidadeMedico/{idMedico}` → Obter agenda de disponibilidade de um médico
+   - `POST /api/DisponibilidadeMedico` → Cadastrar disponibilidade de médicos
+   - `POST /api/DisponibilidadeMedico/{idMedico}` → Cadastrar disponibilidade de médicos, com apoio de inteligência artificial (utilizando o modelo gemini-2.0-flash)
+   - `PUT /api/DisponibilidadeMedico/{idMedico}/{idDisponibilidadeMedico}` → Atualizar bloco de disponibilidade
+- **Agendamentos**
+   - `GET /api/Agendamento/{idMedico}` → Listar agendamentos de um médico
+   - `GET /api/Agendamento/{idMedico}/{Data}` → Buscar agendamentos em uma data específica
+   - `POST /api/Agendamento` → Criar um novo agendamento
+   - `PUT /api/Agendamento/AprovarAgendamento/{idMedico}` → Aprovar um agendamento
+   - `PUT /api/Agendamento/RecusarAgendamento/{idMedico}` → Recusar um agendamento
+   - `PUT /api/Agendamento/CancelarAgendamento/{idMedico}` → Cancelar um agendamento
 
-- Cadastro/Edição de Horários Disponiveis (Médico): O sistema deve permitir que o médico faça o Cadastro e Edição de seus horários disponíveis para agendamento de consultas
+## Persistência de Dados
 
+Usamos o Dapper para alta performance e simplicidade na manipulação de dados, permitindo consultas rápidas e eficientes, com baixo overhead, em um ambiente seguro e escalável. Isso melhora a velocidade e a produtividade do desenvolvimento.
 
-### Paciente - Cadastro
+API está hospedada no Azure SQL, que oferece escalabilidade, alta disponibilidade, segurança robusta, integração simplificada com outras ferramentas do Azure. Essa combinação melhora o desempenho e a eficiência da API.
 
-- Cadastro do Usuário (Paciente): O paciente poderá se cadastrar, preenchendo os campos: Nome, CPF, E-mail e Senha.
+## Testes
 
-- Autenticação do Usuário (Paciente): O sistema deve permitir que o paciente faça login usando o E-Mail e Senha.
+O projeto inclui testes unitários para garantir a qualidade e a funcionalidade das APIs.
 
-### Paciente - Agendamento
+## Serviço de Notificação
 
-- Busca por Médicos (Paciente): O sistema deve permitir que o paciente visualize a listagem dos médicos disponíveis
+O projeto inclui o Azure Communication Services para disparo de emails, que oferece integração fácil com outros serviços Azure, alta escalabilidade, segurança robusta e capacidade de rastreamento e análise de métricas, melhorando a eficiência e o gerenciamento das comunicações por email.
 
-- Agendamento de Consultas (Paciente): Após selecionar o médico, o paciente deve poder visualizar as consultas com o médico com os horários disponíveis e efetuar o agendamento.
- 
-- O sistema deve ser capaz de suportar múltiplos acessos simultâneos e garantir que apenas uma marcação de consulta seja permitida para um determinado horário.
+## Orquestração e Gerenciamento de Containeres
 
-- O sistema deve validar a disponibilidade do horário selecionado em tempo real, assegurando que não haja sobreposição de horários para consultas agendadas.
+Este projeto utiliza **Kubernetes** para gerenciar a implantação, escalabilidade e resiliência dos microsserviços.
 
-### Notificação de consulta marcada (Médico): 
+- Implementamos **ReplicaSets** para garantir que o número necessário de réplicas de cada microsserviço esteja sempre em execução, aumentando a disponibilidade.
+- **Deployments** são usados para gerenciar as atualizações dos microsserviços de maneira declarativa e segura, garantindo alta disponibilidade durante mudanças.
+- **Services** foram configurados para garantir a comunicação entre microsserviços e a descoberta automática dos mesmos no cluster.
 
-Após o agendamento, feito pelo usuário Paciente, o médico deverá receber um e-mail contendo:
+## Automatização e Build
 
-Título do e-mail:
->ˮHealth&Med - Nova consulta agendadaˮ
+Criamos dois workflows no GitHub Actions para isolar a construção e publicação das imagens Docker:
 
-Corpo do e-mail:
-
->ˮOlá, Dr. {nome_do_médico}!
->
->Você tem uma nova consulta marcada! Paciente: {nome_do_paciente}.
-> 
->Data e horário: {data} às {horário_agendado}.ˮ
-
-## Estrutura de Dados
-
-![image](https://github.com/user-attachments/assets/473f9cb3-b879-4ce4-ac11-5d41afba7a07)
+1. Build & Test: O workflow do GitHub Actions realiza as seguintes etapas:
+   - **Disparadores:** Executa em push ou pull request na branch `dev`.
+   - **Job de Build:**
+      - Clona o repositório.
+      - Configura o .NET Core na versão 8.0.x.
+      - Instala as dependências com `dotnet restore`.
+      - Constrói o projeto em modo Release sem restaurar as dependências novamente.
+      - Executa os testes no modo Release.
+1. Deploy:  O workflow do GitHub Actions  realiza as seguintes etapas:
+   - **Disparadores:** Executa em push na branch `master` ou manualmente.
+   - **Job de Build:**
+      - Clona o repositório.
+      - Constrói e atualiza a imagem healthmed_agendamento para o Docker Hub.
+   - **Job de Deploy:**
+      - Aplica os arquivos `deployment.yaml` e `service.yaml` no Kubernetes (AKS), realizando o deploy da imagem atualizada para o Azure Kubernetes Services.
 
