@@ -64,7 +64,3 @@ jobs:
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
-          
-      - name: Wait for AKS Deploy
-        run: kubectl wait --for-condition=available
-    
