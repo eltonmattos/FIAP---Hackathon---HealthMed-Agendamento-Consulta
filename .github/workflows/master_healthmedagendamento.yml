@@ -7,58 +7,45 @@ on:
   push:
     branches:
       - master
-
-env:
-  AZURE_WEBAPP_NAME: healthmedagendamento 
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
-  DOTNET_VERSION: '8.0.x' 
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: actions/checkout@main
-  
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }} 
-    
-    - name: dotnet build and publish
-      run: |
-        dotnet restore
-        dotnet build --configuration Release
-    
-    - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
-        
-    - name: dotnet build and publish
-      run: dotnet publish -c Release --property:PublishDir='${{ env.AZURE_WEBAPP_PACKAGE_PATH }}' 
-
-    - name: Azure WebApp
-      uses: Azure/webapps-deploy@v3.0.1
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }}
-        images: eltonmattos/healthmed_agendamento:latest
-        # Applies to Web App Containers only: Path of the Docker-Compose file. Should be a fully qualified path or relative to the default working directory. Required for multi-container scenario
-        # configuration-file: # optional
+    - uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Docker Login
-      uses: docker/login-action@v3.3.0
+    - name: Log in to registry
+      uses: docker/login-action@v2
       with:
-          registry: https://index.docker.io/v1/
-          username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PWD }}
+        registry: https://index.docker.io/v1/
+        username: ${{ secrets.AzureAppService_ContainerUsername_763dc1e1b7cc4d498e5ec8269b8719f1 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_fd3e68f1eade4f95bbb4d37fa34b2dc9 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/eltonmattos/healthmed_agendamento:latest
-        file: ./Dockerfile
-        
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_763dc1e1b7cc4d498e5ec8269b8719f1 }}/eltonmattos/healthmed_agendamento:${{ github.sha }}
+        file: ./HealthMed.API.AgendamentoConsulta/Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'healthmedagendamento'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_78d1b4d2cb404656bef4aa31f3b03eb8 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_763dc1e1b7cc4d498e5ec8269b8719f1 }}/eltonmattos/healthmed_agendamento:${{ github.sha }}'
