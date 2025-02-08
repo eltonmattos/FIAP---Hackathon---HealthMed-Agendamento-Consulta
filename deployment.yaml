@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: healthmed
-        image: eltonmattos/healthmed_agendamento:1dba2d685f782e5e046e50ce39d89305a838990d
+        image: eltonmattos/healthmed_agendamento:latest
         ports:
         - containerPort: 8080
