@@ -85,15 +85,15 @@ namespace HealthMed.API.AgendamentoConsulta.Repository
                                     m.ValorConsulta AS ValorConsulta
                                 FROM 
                                     dbo.Medico m
-                                JOIN 
+                                LEFT JOIN 
                                     dbo.rel_Especialidades_Medico re ON m.Id = re.IdMedico
-                                JOIN 
+                                LEFT JOIN 
                                     dbo.Especialidades e ON re.IdEspecialidade = e.Id ");
 
                 if (!String.IsNullOrEmpty(especialidade))
                 {
                     query.Append("WHERE "); whereUsed = true;
-                    query.Append($"e.Nome LIKE '%{especialidade}%' ");
+                    query.Append($"UPPER(e.Nome) LIKE '%{especialidade.ToUpper()}%' ");
                 }
                 if (!String.IsNullOrEmpty(estado))
                 {
