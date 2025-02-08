@@ -24,7 +24,7 @@ namespace HealthMed.API.AgendamentoConsulta.Services
     public class GeminiRequest
     {
         [JsonProperty("contents")] // Mapeia a propriedade contents para "contents" no JSON
-        public Contents[] Contents { get; set; }
+        public required Contents[] Contents { get; set; }
 
         public static string Serializar(GeminiRequest requisicao)
         {
@@ -33,7 +33,8 @@ namespace HealthMed.API.AgendamentoConsulta.Services
 
         public static GeminiRequest Desserializar(string json)
         {
-            return JsonConvert.DeserializeObject<GeminiRequest>(json);
+            GeminiRequest? requisicao = JsonConvert.DeserializeObject<GeminiRequest>(json) ?? throw new InvalidDataException("O JSON não pôde ser desserializado para um objeto GeminiRequest.");
+            return requisicao;
         }
     }
 
@@ -41,30 +42,29 @@ namespace HealthMed.API.AgendamentoConsulta.Services
 
 
 
-    public class AIService
+    [method: SetsRequiredMembers]
+
+
+
+
+    public class AIService(String api_key, String api_url)
     {
-        public required String apiKey { get; set; }
-        public required String apiUrl { get; set; }
-        [SetsRequiredMembers]
-        public AIService(String api_key, String api_url)
-        {
-            this.apiKey = api_key;
-            this.apiUrl = api_url;
-        }
+        public required String ApiKey { get; set; } = api_key;
+        public required String ApiUrl { get; set; } = api_url;
+
         public async Task<string> PromptApi(string prompt)
         {
-            GeminiRequest requisicao = new GeminiRequest
+            GeminiRequest requisicao = new()
             {
-                Contents = new Contents[]
-                {
-                    new Contents
-                    {
-                        Parts = new Part[]
-                        {
-                            new Part { Text = prompt }
-                        }
+                Contents =
+                [
+                    new() {
+                        Parts =
+                        [
+                            new() { Text = prompt }
+                        ]
                     }
-                }
+                ]
             };
 
             // Serializar o objeto para JSON
@@ -79,7 +79,7 @@ namespace HealthMed.API.AgendamentoConsulta.Services
             System.Console.WriteLine(pergunta);
 
             var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={ApiKey}");
             var content = new StringContent(GeminiRequest.Serializar(requisicao));
             request.Content = content;
             var response = await client.SendAsync(request);

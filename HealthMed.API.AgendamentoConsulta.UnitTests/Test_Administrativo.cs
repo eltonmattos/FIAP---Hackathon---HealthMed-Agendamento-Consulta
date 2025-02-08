@@ -70,7 +70,7 @@ namespace HealthMed.API.AgendamentoConsulta.UnitTests
         }
 
         [Fact]
-        public async void Paciente_POST_CadastrarPaciente_SenhaInvalida()
+        public void Paciente_POST_CadastrarPaciente_SenhaInvalida()
         {
             PacienteRepository pacienteRepository = new(TestHelpers.GetConfiguration());
             Paciente paciente = new("Raphael Ribeiro", "raphaelribeiro331@gmail.com", "73121929046", "123");

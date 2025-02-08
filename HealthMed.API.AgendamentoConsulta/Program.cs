@@ -16,7 +16,14 @@ builder.Services.AddScoped<DisponibilidadeMedicoRepository>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddTransient<IMailService, MailService>();
 
-var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]);
+byte[]? key = null;
+
+var jwtSecret = builder.Configuration["JwtSettings:Secret"];
+if (string.IsNullOrEmpty(jwtSecret))
+{
+    throw new InvalidOperationException("JWT Secret Key is not configured properly.");
+}
+key = Encoding.UTF8.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -89,7 +96,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] { }
+            Array.Empty<string>()
         }
     });
 });
