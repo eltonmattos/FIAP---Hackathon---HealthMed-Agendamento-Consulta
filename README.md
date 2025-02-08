@@ -4,6 +4,9 @@
 
 Este projeto é uma aplicação ASP .NET Core, composta de uma API com funcionalidades para cadastro, cada uma com funcionalidades distintas. Utilizamos GitHub Actions para automatizar a construção e publicação das imagens Docker, garantindo um build isolado para cada API.
 
+Acesso: http://128.203.145.89:8080/
+Definições da API: [HealthMed API.postman_collection.json.zip](https://github.com/user-attachments/files/18722502/HealthMed.API.postman_collection.json.zip)
+
 ## Estrutura da API
 
 ![azure-Página-2 drawio](https://github.com/user-attachments/assets/b279ea2a-b35c-4e10-907b-e39ef29458e5)
