@@ -18,7 +18,7 @@ namespace HealthMed.API.AgendamentoConsulta.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok("Teste Deploy API");
+            return Ok("API Healthmed Agendamento");
         }
     }
 
