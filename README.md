@@ -59,15 +59,15 @@ O projeto inclui o Azure Communication Services para disparo de Emails, que ofer
 
 ## Orquestração e Gerenciamento de Containeres
 
-Este projeto utiliza **Kubernetes** para gerenciar a implantação, escalabilidade e resiliência dos microsserviços.
+Este projeto utiliza **Azure Kubernetes Services (AKS)** para gerenciar a implantação, escalabilidade e resiliência dos microsserviços. o Azure Kubernetes Services (AKS) oferece gerenciamento simplificado, integração com Azure, alta segurança, escalabilidade automática e economia de tempo e custos. 
 
-- Implementamos **ReplicaSets** para garantir que o número necessário de réplicas de cada microsserviço esteja sempre em execução, aumentando a disponibilidade.
-- **Deployments** são usados para gerenciar as atualizações dos microsserviços de maneira declarativa e segura, garantindo alta disponibilidade durante mudanças.
-- **Services** foram configurados para garantir a comunicação entre microsserviços e a descoberta automática dos mesmos no cluster.
+- Implementamos **ReplicaSets** para garantir que o número necessário de réplicas da API esteja sempre em execução, aumentando a disponibilidade.
+- **Deployments** são usados para gerenciar as atualizações da API de maneira declarativa e segura, garantindo alta disponibilidade durante mudanças.
+- **Services** foram configurados para garantir a disponibilidade da API e a descoberta automática dos mesmos no cluster.
 
 ## Automatização e Build
 
-Criamos dois workflows no GitHub Actions para isolar a construção e publicação das imagens Docker:
+Criamos dois workflows no GitHub Actions para isolar os testes em dev, e construção e publicação das imagens no DockerHub e no AKS:
 
 1. Build & Test: O workflow do GitHub Actions realiza as seguintes etapas:
    - **Disparadores:** Executa em push ou pull request na branch `dev`.
