@@ -6,6 +6,7 @@ Este projeto é uma aplicação .NET Core, composta de uma API com funcionalidad
 
 - Acesso: http://128.203.145.89:8080/
 - Definições da API: [HealthMed API.postman_collection.json.zip](https://github.com/user-attachments/files/18722502/HealthMed.API.postman_collection.json.zip)
+- Vídeo de Apresentação: https://www.youtube.com/watch?v=Pvj7wy_Uj50
 
 ## Estrutura da API
 
